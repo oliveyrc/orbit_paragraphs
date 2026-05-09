@@ -11,6 +11,16 @@ Orbit Paragraphs is a custom Drupal 11 module that provides common Paragraph fie
 - Paragraphs
 - Paragraphs Editor Enhancements
 
+## Features
+
+- Interactive Paragraph bundle creation via Drush.
+- Paragraph category tagging using Paragraphs Editor Enhancements.
+- Multiple categories can be assigned in one command.
+- Automatic Field Group setup on the bundle manage form display.
+- Field Group parent tab: Tabs.
+- Field Group child tab: Content.
+- Field Group child tab: Settings.
+
 ## Drush commands
 
 Create a new Paragraph type interactively:
@@ -30,6 +40,22 @@ Create a Paragraph type with an explicit machine name and description:
 ```bash
 drush orbit-paragraphs:create "CTA" --machine-name=cta --description="Call to action paragraph."
 ```
+
+Create a Paragraph type and assign a single category:
+
+```bash
+drush orbit-paragraphs:create "Hero Banner" --category=media
+```
+
+Create a Paragraph type and assign multiple categories:
+
+```bash
+drush orbit-paragraphs:create "Feature Grid" --category=text,media,news
+```
+
+When no category is provided, the command prompts you to select one or more categories.
+After creation, the command also configures the bundle's default paragraph form display with a
+Tabs wrapper containing Content and Settings child tabs.
 
 ## License
 
