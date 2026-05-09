@@ -6,3 +6,4 @@ core_version_requirement: ^11
 php: 8.4
 dependencies:
   - paragraphs:paragraphs
+  - field_group:field_group

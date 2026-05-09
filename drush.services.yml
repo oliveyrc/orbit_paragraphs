@@ -1,0 +1,7 @@
+services:
+  orbit_paragraphs.commands:
+    class: Drupal\orbit_paragraphs\Drush\Commands\OrbitParagraphsCommands
+    arguments:
+      - '@entity_type.manager'
+    tags:
+      - { name: drush.command }
