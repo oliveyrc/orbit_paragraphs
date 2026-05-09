@@ -137,6 +137,7 @@ final class OrbitParagraphsCommands extends DrushCommands
         }
 
         $paragraph_type->save();
+        $this->createParagraphFormDisplayTabs($machine_name);
 
         $message = 'Created paragraph type "' . $label . '" ('
             . $machine_name . ').';
@@ -154,6 +155,109 @@ final class OrbitParagraphsCommands extends DrushCommands
         }
 
         $this->logger()->success($message);
+    }
+
+    /**
+     * Creates default Field Group tabs on paragraph form display.
+     *
+     * @param string $bundle
+     *   The paragraph bundle machine name.
+     */
+    protected function createParagraphFormDisplayTabs(string $bundle): void {
+        $form_display_storage = $this->entityTypeManager->getStorage('entity_form_display');
+        $form_display_id = 'paragraph.' . $bundle . '.default';
+        $form_display = $form_display_storage->load($form_display_id);
+
+        if ($form_display === NULL) {
+            $form_display = $form_display_storage->create([
+                'id' => $form_display_id,
+                'targetEntityType' => 'paragraph',
+                'bundle' => $bundle,
+                'mode' => 'default',
+                'status' => TRUE,
+            ]);
+        }
+
+        $third_party_settings = (array) $form_display->get('third_party_settings');
+        $field_group_settings = (array) ($third_party_settings['field_group'] ?? []);
+        $changed = FALSE;
+
+        foreach ($this->defaultFieldGroups() as $group_name => $group_definition) {
+            if (isset($field_group_settings[$group_name])) {
+                continue;
+            }
+
+            $field_group_settings[$group_name] = $group_definition;
+            $changed = TRUE;
+        }
+
+        if ($changed) {
+            $third_party_settings['field_group'] = $field_group_settings;
+            $form_display->set('third_party_settings', $third_party_settings);
+        }
+
+        $form_display->save();
+    }
+
+    /**
+     * Returns default field group definitions for paragraph form display.
+     *
+     * @return array<string, array<string, mixed>>
+     *   Field group definitions keyed by group machine name.
+     */
+    protected function defaultFieldGroups(): array {
+        return [
+            'group_tabs' => [
+                'children' => [
+                    'group_content',
+                    'group_settings',
+                ],
+                'label' => 'Tabs',
+                'region' => 'content',
+                'parent_name' => '',
+                'weight' => 0,
+                'format_type' => 'tabs',
+                'format_settings' => [
+                    'id' => '',
+                    'classes' => '',
+                    'direction' => 'vertical',
+                    'width_breakpoint' => 640,
+                    'formatter' => 'closed',
+                    'description' => '',
+                    'required_fields' => TRUE,
+                ],
+            ],
+            'group_content' => [
+                'children' => [],
+                'label' => 'Content',
+                'region' => 'content',
+                'parent_name' => 'group_tabs',
+                'weight' => 0,
+                'format_type' => 'tab',
+                'format_settings' => [
+                    'id' => '',
+                    'classes' => '',
+                    'formatter' => 'open',
+                    'description' => '',
+                    'required_fields' => TRUE,
+                ],
+            ],
+            'group_settings' => [
+                'children' => [],
+                'label' => 'Settings',
+                'region' => 'content',
+                'parent_name' => 'group_tabs',
+                'weight' => 1,
+                'format_type' => 'tab',
+                'format_settings' => [
+                    'id' => '',
+                    'classes' => '',
+                    'formatter' => 'closed',
+                    'description' => '',
+                    'required_fields' => TRUE,
+                ],
+            ],
+        ];
     }
 
     /**
