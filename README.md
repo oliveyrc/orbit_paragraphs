@@ -1,8 +1,8 @@
-# Orbit Webform
+# Orbit Paragraphs
 
 <img src="assets/orbit-paragraphs-logo.svg" alt="Orbit Paragraphs logo" width="150" height="150" />
 
-Orbit Webform is a custom Drupal 11 module that provides common Paragraph fields and reports for Orbit projects.
+Orbit Paragraphs is a custom Drupal 11 module that provides common Paragraph fields and reports for Orbit projects.
 
 ## Requirements
 
