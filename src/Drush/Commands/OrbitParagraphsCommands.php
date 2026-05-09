@@ -55,7 +55,7 @@ final class OrbitParagraphsCommands extends DrushCommands
     )]
     #[CLI\Option(
         name: 'category',
-        description: 'Paragraph category machine name. Prompts if omitted.',
+        description: 'Paragraph category IDs (comma-separated). Prompts if omitted.',
     )]
     #[CLI\Usage(
         name: 'drush orbit-paragraphs:create',
@@ -70,6 +70,10 @@ final class OrbitParagraphsCommands extends DrushCommands
             . '--category=cta',
         description: 'Use the label, machine name, and category, then prompt '
             . 'for description.',
+    )]
+    #[CLI\Usage(
+        name: 'drush orbit-paragraphs:create "Feature" --category=text,media',
+        description: 'Assign multiple categories using a comma-separated list.',
     )]
     public function createParagraphType(
         ?string $label = NULL,
@@ -91,7 +95,7 @@ final class OrbitParagraphsCommands extends DrushCommands
         );
         $description = $description ?? '';
         $categories = $this->loadParagraphCategories();
-        $category_id = $this->resolveParagraphCategory(
+        $category_ids = $this->resolveParagraphCategories(
             $options['category'] ?? NULL,
             $categories,
         );
@@ -124,11 +128,11 @@ final class OrbitParagraphsCommands extends DrushCommands
             );
         }
 
-        if ($category_id !== NULL) {
+        if ($category_ids !== []) {
             $paragraph_type->setThirdPartySetting(
                 'paragraphs_ee',
                 'paragraphs_categories',
-                [$category_id],
+                $category_ids,
             );
         }
 
@@ -137,10 +141,16 @@ final class OrbitParagraphsCommands extends DrushCommands
         $message = 'Created paragraph type "' . $label . '" ('
             . $machine_name . ').';
 
-        if ($category_id !== NULL) {
+        if ($category_ids !== []) {
+            $category_labels = [];
+            foreach ($category_ids as $category_id) {
+                $category_labels[] = (string) $categories[$category_id]->label();
+            }
+
             $message = 'Created paragraph type "' . $label . '" ('
-                . $machine_name . ') in category "'
-                . $categories[$category_id]->label() . '".';
+                . $machine_name . ') in categories: '
+                . implode(', ', $category_labels)
+                . '.';
         }
 
         $this->logger()->success($message);
@@ -181,39 +191,60 @@ final class OrbitParagraphsCommands extends DrushCommands
     }
 
     /**
-     * Resolves the paragraph category to assign to a new bundle.
+     * Resolves paragraph categories to assign to a new bundle.
      *
      * @param string|null $category_id
-     *   The requested category id, if provided.
+     *   The requested category IDs as a comma-separated string, if provided.
      * @param array<string, ParagraphsCategoryInterface> $categories
      *   Available categories keyed by machine name.
      *
-     * @return string|null
-     *   The selected category id, or NULL if no categories are available.
+     * @return string[]
+     *   Selected category IDs, or an empty array when none are available.
      */
-    protected function resolveParagraphCategory(
+    protected function resolveParagraphCategories(
         ?string $category_id,
         array $categories,
-    ): ?string {
+    ): array {
         if ($categories === []) {
             $this->logger()->warning(
                 'No paragraph categories are available. The paragraph type will '
                 . 'be created without a category tag.',
             );
-            return NULL;
+            return [];
         }
 
         if ($category_id !== NULL && $category_id !== '') {
-            if (!isset($categories[$category_id])) {
+            $requested_categories = array_values(
+                array_filter(
+                    array_map('trim', explode(',', $category_id)),
+                    static fn(string $value): bool => $value !== '',
+                ),
+            );
+
+            if ($requested_categories === []) {
+                return [];
+            }
+
+            $requested_categories = array_values(array_unique($requested_categories));
+
+            $missing_categories = [];
+            foreach ($requested_categories as $requested_category) {
+                if (!isset($categories[$requested_category])) {
+                    $missing_categories[] = $requested_category;
+                }
+            }
+
+            if ($missing_categories !== []) {
                 throw new \InvalidArgumentException(
-                    'The paragraph category "' . $category_id . '" does not exist. '
+                    'The paragraph categories "' . implode(', ', $missing_categories)
+                    . '" do not exist. '
                     . 'Available categories: '
                     . implode(', ', array_keys($categories))
                     . '.',
                 );
             }
 
-            return $category_id;
+            return $requested_categories;
         }
 
         $choices = [];
@@ -222,12 +253,24 @@ final class OrbitParagraphsCommands extends DrushCommands
         }
 
         $selection = $this->io()->choice(
-            'Paragraph category',
+            'Paragraph categories (use space to select multiple)',
             array_keys($choices),
-            array_key_first($choices),
+            array_key_first($choices) !== NULL ? [array_key_first($choices)] : [],
+            TRUE,
         );
 
-        return $choices[$selection] ?? NULL;
+        if (!is_array($selection)) {
+            return [];
+        }
+
+        $selected_categories = [];
+        foreach ($selection as $selected_label) {
+            if (isset($choices[$selected_label])) {
+                $selected_categories[] = $choices[$selected_label];
+            }
+        }
+
+        return array_values(array_unique($selected_categories));
     }
 
     /**
