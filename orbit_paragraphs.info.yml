@@ -1,0 +1,8 @@
+name: Orbit Paragraphs
+type: module
+description: Provides common paragraph fields and functionality for Orbit.
+package: Orbit
+core_version_requirement: ^11
+php: 8.4
+dependencies:
+  - paragraphs:paragraphs

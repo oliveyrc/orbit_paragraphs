@@ -1,0 +1,17 @@
+{
+    "name": "oliveyrc/orbit_paragraphs",
+    "description": "Provides Orbit webforms and Webform element restrictions.",
+    "type": "drupal-custom-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Richard Olivey",
+            "email": "richard@olivey.net"
+        }
+    ],
+    "require": {
+        "drupal/paragraphs": "^1.20",
+        "drupal/core": "^11",
+        "php": ">=8.4"
+    }
+}
