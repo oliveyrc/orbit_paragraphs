@@ -220,7 +220,7 @@ final class OrbitParagraphsCommands extends DrushCommands
                 'format_settings' => [
                     'id' => '',
                     'classes' => '',
-                    'direction' => 'vertical',
+                    'direction' => 'horizontal',
                     'width_breakpoint' => 640,
                     'formatter' => 'closed',
                     'description' => '',
