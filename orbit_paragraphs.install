@@ -1,8 +1,69 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * @file
  * Install, update, and uninstall functions for Orbit Paragraphs.
  */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function orbit_paragraphs_install(): void {
+  orbit_paragraphs_create_default_categories();
+}
+
+/**
+ * Creates the default Orbit paragraph categories when they do not exist.
+ *
+ * @return string[]
+ *   The labels of the categories that were created.
+ */
+function orbit_paragraphs_create_default_categories(): array {
+
+  $storage = \Drupal::entityTypeManager()->getStorage('paragraphs_category');
+  $created = [];
+
+  foreach (orbit_paragraphs_default_categories() as $weight => $category) {
+    if ($storage->load($category['id'])) {
+      continue;
+    }
+
+    $storage->create([
+      'id' => $category['id'],
+      'label' => $category['label'],
+      'weight' => $weight,
+    ])->save();
+    $created[] = $category['label'];
+  }
+
+  return $created;
+}
+
+/**
+ * Returns the default Orbit paragraph categories.
+ *
+ * @return array<int, array{id: string, label: string}>
+ *   The default categories keyed in display order.
+ */
+function orbit_paragraphs_default_categories(): array {
+  return [
+    [
+      'id' => 'news',
+      'label' => 'News',
+    ],
+    [
+      'id' => 'cta',
+      'label' => 'CTA',
+    ],
+    [
+      'id' => 'media',
+      'label' => 'Media',
+    ],
+    [
+      'id' => 'text',
+      'label' => 'Text',
+    ],
+  ];
+}

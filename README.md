@@ -9,6 +9,7 @@ Orbit Paragraphs is a custom Drupal 11 module that provides common Paragraph fie
 - Drupal 11
 - PHP 8.4 or later
 - Paragraphs
+- Paragraphs Editor Enhancements
 
 ## Drush commands
 

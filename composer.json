@@ -11,6 +11,7 @@
     ],
     "require": {
         "drupal/paragraphs": "^1.20",
+        "drupal/paragraphs_ee": "^10.0",
         "drupal/core": "^11",
         "drupal/field_group": "^3.0",
         "php": ">=8.4"
