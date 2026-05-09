@@ -12,7 +12,13 @@ Orbit Paragraphs is a custom Drupal 11 module that provides common Paragraph fie
 
 ## Drush commands
 
-Create a new Paragraph type:
+Create a new Paragraph type interactively:
+
+```bash
+drush orbit-paragraphs:create
+```
+
+Create a new Paragraph type with a supplied label and prompted description:
 
 ```bash
 drush orbit-paragraphs:create "Hero Banner"

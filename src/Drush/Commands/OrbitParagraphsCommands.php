@@ -29,26 +29,55 @@ final class OrbitParagraphsCommands extends DrushCommands {
      * Create a paragraph type.
      */
     #[CLI\Command(name: 'orbit-paragraphs:create', aliases: ['opc'])]
-    #[CLI\Argument(name: 'label', description: 'The human-readable paragraph type label.')]
-    #[CLI\Option(name: 'machine-name', description: 'The paragraph type machine name. Defaults to a generated value from the label.')]
-    #[CLI\Option(name: 'description', description: 'A short description of the paragraph type.')]
-    #[CLI\Usage(name: 'drush orbit-paragraphs:create "Hero Banner"', description: 'Create a Hero Banner paragraph type.')]
-    #[CLI\Usage(name: 'drush orbit-paragraphs:create "CTA" --machine-name=cta --description="Call to action paragraph."', description: 'Create a paragraph type with an explicit machine name and description.')]
+    #[CLI\Argument(
+        name: 'label',
+        description: 'Paragraph type label. Prompts if omitted.',
+    )]
+    #[CLI\Option(
+        name: 'machine-name',
+        description: 'Machine name. Defaults from the label.',
+    )]
+    #[CLI\Option(
+        name: 'description',
+        description: 'Paragraph type description. Prompts if omitted.',
+    )]
+    #[CLI\Usage(
+        name: 'drush orbit-paragraphs:create',
+        description: 'Prompt for a paragraph type label and description.',
+    )]
+    #[CLI\Usage(
+        name: 'drush orbit-paragraphs:create "Hero Banner"',
+        description: 'Use the given label and prompt for the description.',
+    )]
+    #[CLI\Usage(
+        name: 'drush orbit-paragraphs:create "CTA" --machine-name=cta',
+        description: 'Use the given label and machine name, then prompt for description.',
+    )]
     public function createParagraphType(
-        string $label,
+        ?string $label = null,
         array $options = [
-      'machine-name' => InputOption::VALUE_REQUIRED,
-      'description' => InputOption::VALUE_OPTIONAL,
+            'machine-name' => InputOption::VALUE_REQUIRED,
+            'description' => InputOption::VALUE_OPTIONAL,
         ],
     ): void {
-        $machine_name = $options['machine-name'] ?: $this->machineNameFromLabel($label);
-        $description = $options['description'] ?: '';
+        $label = $label ?: $this->io()->ask(
+            'Paragraph type label',
+            required: true,
+        );
+        $machine_name = $options['machine-name']
+            ?: $this->machineNameFromLabel($label);
+        $description = $options['description'] ?? $this->io()->ask(
+            'Paragraph type description',
+            default: '',
+        );
+        $description = $description ?? '';
 
         if (!preg_match('/^[a-z0-9_]+$/', $machine_name)) {
             throw new \InvalidArgumentException(
                 dt(
-                    'The machine name "@machine_name" must contain only lowercase letters, numbers, and underscores.', [
-                    '@machine_name' => $machine_name,
+                    'The machine name "@machine_name" must contain only lowercase letters, numbers, and underscores.',
+                    [
+                        '@machine_name' => $machine_name,
                     ]
                 )
             );
@@ -59,8 +88,9 @@ final class OrbitParagraphsCommands extends DrushCommands {
         if ($storage->load($machine_name)) {
             throw new \InvalidArgumentException(
                 dt(
-                    'The paragraph type "@machine_name" already exists.', [
-                    '@machine_name' => $machine_name,
+                    'The paragraph type "@machine_name" already exists.',
+                    [
+                        '@machine_name' => $machine_name,
                     ]
                 )
             );
@@ -68,19 +98,20 @@ final class OrbitParagraphsCommands extends DrushCommands {
 
         $paragraph_type = $storage->create(
             [
-            'id' => $machine_name,
-            'label' => $label,
-            'description' => $description,
-            'behavior_plugins' => [],
+                'id' => $machine_name,
+                'label' => $label,
+                'description' => $description,
+                'behavior_plugins' => [],
             ]
         );
         $paragraph_type->save();
 
         $this->logger()->success(
             dt(
-                'Created paragraph type "@label" (@machine_name).', [
-                '@label' => $label,
-                '@machine_name' => $machine_name,
+                'Created paragraph type "@label" (@machine_name).',
+                [
+                    '@label' => $label,
+                    '@machine_name' => $machine_name,
                 ]
             )
         );
@@ -97,14 +128,15 @@ final class OrbitParagraphsCommands extends DrushCommands {
         if ($machine_name === '') {
             throw new \InvalidArgumentException(
                 dt(
-                    'Unable to generate a machine name from the label "@label". Use --machine-name to provide one.', [
-                    '@label' => $label,
+                    'Unable to generate a machine name from the label "@label". Use --machine-name to provide one.',
+                    [
+                        '@label' => $label,
                     ]
                 )
             );
         }
 
-    return $machine_name;
+        return $machine_name;
     }
 
 }
