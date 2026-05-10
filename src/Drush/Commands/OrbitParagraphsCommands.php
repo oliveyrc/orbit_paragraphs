@@ -191,6 +191,47 @@ final class OrbitParagraphsCommands extends DrushCommands
             $changed = TRUE;
         }
 
+        $group_settings_children = (array) ($field_group_settings['group_settings']['children'] ?? []);
+        if (!in_array('status', $group_settings_children, TRUE)) {
+            $group_settings_children[] = 'status';
+            $field_group_settings['group_settings']['children'] = $group_settings_children;
+            $changed = TRUE;
+        }
+
+        $group_content_children = (array) ($field_group_settings['group_content']['children'] ?? []);
+        $status_index = array_search('status', $group_content_children, TRUE);
+        if ($status_index !== FALSE) {
+            unset($group_content_children[$status_index]);
+            $field_group_settings['group_content']['children'] = array_values($group_content_children);
+            $changed = TRUE;
+        }
+
+        $status_component = (array) $form_display->getComponent('status');
+        $status_component_parent = (string) ($status_component['third_party_settings']['field_group']['parent_name'] ?? '');
+        if ($status_component === [] || $status_component_parent !== 'group_settings') {
+            $form_display->setComponent('status', [
+                'type' => 'boolean_checkbox',
+                'weight' => 120,
+                'region' => 'content',
+                'settings' => [
+                    'display_label' => TRUE,
+                ],
+                'third_party_settings' => [
+                    'field_group' => [
+                        'parent_name' => 'group_settings',
+                    ],
+                ],
+            ]);
+            $changed = TRUE;
+        }
+
+        $hidden = (array) $form_display->get('hidden');
+        if (($hidden['status'] ?? FALSE) === TRUE) {
+            unset($hidden['status']);
+            $form_display->set('hidden', $hidden);
+            $changed = TRUE;
+        }
+
         if ($changed) {
             $third_party_settings['field_group'] = $field_group_settings;
             $form_display->set('third_party_settings', $third_party_settings);
