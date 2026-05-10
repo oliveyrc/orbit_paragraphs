@@ -352,6 +352,8 @@ final class OrbitParagraphsCommands extends DrushCommands
         }
 
         $choices = [];
+        $none_choice = '- None -';
+        $choices[$none_choice] = '';
         foreach ($categories as $id => $category) {
             $choices[sprintf('%s (%s)', $category->label(), $id)] = $id;
         }
@@ -359,7 +361,7 @@ final class OrbitParagraphsCommands extends DrushCommands
         $selection = $this->io()->choice(
             'Paragraph categories (use space to select multiple)',
             array_keys($choices),
-            array_key_first($choices) !== NULL ? [array_key_first($choices)] : [],
+            [$none_choice],
             TRUE,
         );
 
@@ -370,7 +372,11 @@ final class OrbitParagraphsCommands extends DrushCommands
         $selected_categories = [];
         foreach ($selection as $selected_label) {
             if (isset($choices[$selected_label])) {
-                $selected_categories[] = $choices[$selected_label];
+                $selected_category = $choices[$selected_label];
+
+                if ($selected_category !== '') {
+                    $selected_categories[] = $selected_category;
+                }
             }
         }
 
