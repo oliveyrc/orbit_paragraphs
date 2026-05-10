@@ -53,9 +53,15 @@ Create a Paragraph type and assign multiple categories:
 drush orbit-paragraphs:create "Feature Grid" --category=text,media,news
 ```
 
-When no category is provided, the command prompts you to select one or more categories.
+When no category is provided, the command prompts you to select one or more categories, with a
+default option for no category.
 After creation, the command also configures the bundle's default paragraph form display with a
 Tabs wrapper containing Content and Settings child tabs.
+
+## Related Orbit Modules
+
+- [Orbit Paragraphs](https://github.com/oliveyrc/orbit_paragraphs)
+- [Orbit Webform](https://github.com/oliveyrc/orbit_webform)
 
 ## License
 
