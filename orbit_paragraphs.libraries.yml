@@ -1,0 +1,8 @@
+sections_overview:
+  css:
+    theme:
+      css/orbit-paragraphs-sections.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.ajax
+    - core/drupal.dialog.ajax

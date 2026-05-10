@@ -1,0 +1,16 @@
+orbit_paragraphs.sections_overview:
+  path: '/admin/structure/orbit-paragraphs/sections'
+  defaults:
+    _controller: '\Drupal\orbit_paragraphs\Controller\OrbitPageSectionsController::overview'
+    _title: 'Page sections'
+  requirements:
+    _permission: 'administer paragraphs types'
+
+orbit_paragraphs.section_usage_modal:
+  path: '/admin/structure/orbit-paragraphs/sections/{bundle}/usage'
+  defaults:
+    _controller: '\Drupal\orbit_paragraphs\Controller\OrbitPageSectionsController::usageModal'
+    _title_callback: '\Drupal\orbit_paragraphs\Controller\OrbitPageSectionsController::usageTitle'
+  requirements:
+    _permission: 'administer paragraphs types'
+    bundle: '[a-z0-9_]+'

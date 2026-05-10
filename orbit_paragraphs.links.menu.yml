@@ -1,0 +1,13 @@
+orbit_paragraphs.sections_overview:
+  title: 'Page sections'
+  description: 'Browse available page sections and see where they are used.'
+  route_name: orbit_paragraphs.sections_overview
+  parent: entity.paragraphs_type.collection
+  weight: 50
+
+orbit_paragraphs.sections_overview_reports:
+  title: 'Page sections'
+  description: 'Browse available page sections and see where they are used.'
+  route_name: orbit_paragraphs.sections_overview
+  parent: system.admin_reports
+  weight: 50
