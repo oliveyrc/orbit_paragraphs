@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\orbit_paragraphs\Controller;
 
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -15,6 +17,7 @@ use Drupal\node\NodeInterface;
 use Drupal\paragraphs\ParagraphInterface;
 use Drupal\paragraphs\ParagraphsTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -29,6 +32,7 @@ final class OrbitPageSectionsController extends ControllerBase {
     protected EntityTypeManagerInterface $entityTypeManagerService,
     protected DateFormatterInterface $dateFormatter,
     protected FileUrlGeneratorInterface $fileUrlGenerator,
+    protected RequestStack $requestStack,
   ) {}
 
   /**
@@ -39,6 +43,7 @@ final class OrbitPageSectionsController extends ControllerBase {
       $container->get('entity_type.manager'),
       $container->get('date.formatter'),
       $container->get('file_url_generator'),
+      $container->get('request_stack'),
     );
   }
 
@@ -165,7 +170,7 @@ final class OrbitPageSectionsController extends ControllerBase {
   /**
    * Builds modal content showing the latest pages using a section bundle.
    */
-  public function usageModal(string $bundle): array {
+  public function usageModal(string $bundle): array|AjaxResponse {
     $bundle_entity = $this->entityTypeManagerService->getStorage('paragraphs_type')->load($bundle);
     if (!$bundle_entity instanceof ParagraphsTypeInterface) {
       throw new NotFoundHttpException();
@@ -191,28 +196,38 @@ final class OrbitPageSectionsController extends ControllerBase {
         '#attributes' => ['class' => ['messages', 'messages--status']],
         'text' => ['#plain_text' => (string) $this->t('No pages currently use this section.')],
       ];
-      return $build;
     }
+    else {
+      $rows = [];
+      foreach ($nodes as $node) {
+        $rows[] = [
+          Link::fromTextAndUrl($node->label(), $node->toUrl())->toRenderable(),
+          $node->bundle(),
+          $this->dateFormatter->format($node->getChangedTime(), 'short'),
+        ];
+      }
 
-    $rows = [];
-    foreach ($nodes as $node) {
-      $rows[] = [
-        Link::fromTextAndUrl($node->label(), $node->toUrl())->toRenderable(),
-        $node->bundle(),
-        $this->dateFormatter->format($node->getChangedTime(), 'short'),
+      $build['table'] = [
+        '#type' => 'table',
+        '#header' => [
+          $this->t('Page'),
+          $this->t('Content type'),
+          $this->t('Updated'),
+        ],
+        '#rows' => $rows,
+        '#attributes' => ['class' => ['orbit-paragraphs-sections-modal__table']],
       ];
     }
 
-    $build['table'] = [
-      '#type' => 'table',
-      '#header' => [
-        $this->t('Page'),
-        $this->t('Content type'),
-        $this->t('Updated'),
-      ],
-      '#rows' => $rows,
-      '#attributes' => ['class' => ['orbit-paragraphs-sections-modal__table']],
-    ];
+    if ($this->requestStack->getCurrentRequest()?->query->get('_wrapper_format') === 'drupal_modal') {
+      $response = new AjaxResponse();
+      $response->addCommand(new OpenModalDialogCommand(
+        $this->usageTitle($bundle),
+        $build,
+        ['width' => 900],
+      ));
+      return $response;
+    }
 
     return $build;
   }
