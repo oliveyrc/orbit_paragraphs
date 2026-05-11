@@ -219,7 +219,8 @@ final class OrbitPageSectionsController extends ControllerBase {
       ];
     }
 
-    if ($this->requestStack->getCurrentRequest()?->query->get('_wrapper_format') === 'drupal_modal') {
+    $request = $this->requestStack->getCurrentRequest();
+    if ($request !== NULL && $request->query->get('_wrapper_format') === 'drupal_modal') {
       $response = new AjaxResponse();
       $response->addCommand(new OpenModalDialogCommand(
         $this->usageTitle($bundle),
