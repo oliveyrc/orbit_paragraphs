@@ -94,8 +94,13 @@ final class OrbitPageSectionsController extends ControllerBase {
 
       $usage_link = NULL;
       if ($usage_count > 0) {
+        $latest_count = min(10, $usage_count);
         $usage_link = Link::fromTextAndUrl(
-          $this->t('View latest 10 pages'),
+          (string) $this->formatPlural(
+            $latest_count,
+            'View latest 1 page',
+            'View latest @count pages',
+          ),
           Url::fromRoute('orbit_paragraphs.section_usage_modal', ['bundle' => $bundle_id]),
         )->toRenderable();
         $usage_link['#attributes'] = [
@@ -201,7 +206,7 @@ final class OrbitPageSectionsController extends ControllerBase {
       $rows = [];
       foreach ($nodes as $node) {
         $rows[] = [
-          Link::fromTextAndUrl($node->label(), $node->toUrl())->toRenderable(),
+          ['data' => Link::fromTextAndUrl($node->label(), $node->toUrl())->toRenderable()],
           $node->bundle(),
           $this->dateFormatter->format($node->getChangedTime(), 'short'),
         ];
