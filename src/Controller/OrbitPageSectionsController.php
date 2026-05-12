@@ -111,6 +111,14 @@ final class OrbitPageSectionsController extends ControllerBase {
           'orbit_paragraphs/sections_overview',
         ],
       ],
+      'intro' => [
+        '#type' => 'html_tag',
+        '#tag' => 'p',
+        '#attributes' => ['class' => ['orbit-paragraphs-sections-overview__intro']],
+        '#value' => (string) $this->t(
+          'This page lists all the page sections, grouped by category. Use the filter to narrow the report, then open a section to view pages using it.',
+        ),
+      ],
       'filters' => $this->formBuilder()->getForm(
         OrbitPageSectionsFilterForm::class,
         $category_options,
