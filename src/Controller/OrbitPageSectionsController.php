@@ -368,7 +368,7 @@ final class OrbitPageSectionsController extends ControllerBase {
       throw new NotFoundHttpException();
     }
 
-    $nodes = $this->loadNodesForBundle($bundle, 10, 300);
+    $usage_items = $this->loadNodeUsageForBundle($bundle, 10, 300);
 
     $build = [
       '#attached' => [
@@ -382,7 +382,7 @@ final class OrbitPageSectionsController extends ControllerBase {
       ],
     ];
 
-    if ($nodes === []) {
+    if ($usage_items === []) {
       $build['empty'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['messages', 'messages--status']],
@@ -391,9 +391,16 @@ final class OrbitPageSectionsController extends ControllerBase {
     }
     else {
       $rows = [];
-      foreach ($nodes as $node) {
+      foreach ($usage_items as $usage_item) {
+        $node = $usage_item['node'];
+        $paragraph_id = (int) $usage_item['paragraph_id'];
+        $page_url = $node->toUrl();
+        $page_url->setOption('fragment', 'paragraph-' . $paragraph_id);
+        $link = Link::fromTextAndUrl($node->label(), $page_url)->toRenderable();
+        $link['#attributes']['target'] = '_blank';
+        $link['#attributes']['rel'] = 'noopener noreferrer';
         $rows[] = [
-          ['data' => Link::fromTextAndUrl($node->label(), $node->toUrl())->toRenderable()],
+          ['data' => $link],
           $node->bundle(),
           $this->dateFormatter->format($node->getChangedTime(), 'short'),
         ];
@@ -447,6 +454,27 @@ final class OrbitPageSectionsController extends ControllerBase {
     ?int $node_limit = NULL,
     int $paragraph_limit = 0,
   ): array {
+    $usage_items = $this->loadNodeUsageForBundle($bundle, $node_limit, $paragraph_limit);
+
+    $nodes = [];
+    foreach ($usage_items as $node_id => $usage_item) {
+      $nodes[$node_id] = $usage_item['node'];
+    }
+
+    return $nodes;
+  }
+
+  /**
+   * Loads latest node usage details for a section bundle.
+   *
+   * @return array<int, array{node: \Drupal\node\NodeInterface, paragraph_id: int}>
+   *   Usage keyed by node ID in descending paragraph change order.
+   */
+  protected function loadNodeUsageForBundle(
+    string $bundle,
+    ?int $node_limit = NULL,
+    int $paragraph_limit = 0,
+  ): array {
     $paragraph_query = $this->entityTypeManagerService->getStorage('paragraph')->getQuery()
       ->condition('type', $bundle)
       ->sort('id', 'DESC')
@@ -464,7 +492,7 @@ final class OrbitPageSectionsController extends ControllerBase {
 
     $paragraphs = $this->entityTypeManagerService->getStorage('paragraph')->loadMultiple($paragraph_ids);
 
-    $nodes = [];
+    $usage_items = [];
     foreach ($paragraphs as $paragraph) {
       if (!$paragraph instanceof ParagraphInterface) {
         continue;
@@ -486,16 +514,19 @@ final class OrbitPageSectionsController extends ControllerBase {
       }
 
       $node_id = (int) $parent->id();
-      if (!isset($nodes[$node_id])) {
-        $nodes[$node_id] = $parent;
+      if (!isset($usage_items[$node_id])) {
+        $usage_items[$node_id] = [
+          'node' => $parent,
+          'paragraph_id' => (int) $paragraph->id(),
+        ];
       }
 
-      if ($node_limit !== NULL && count($nodes) >= $node_limit) {
+      if ($node_limit !== NULL && count($usage_items) >= $node_limit) {
         break;
       }
     }
 
-    return $nodes;
+    return $usage_items;
   }
 
   /**
