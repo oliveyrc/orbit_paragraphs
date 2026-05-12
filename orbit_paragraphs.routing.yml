@@ -4,7 +4,7 @@ orbit_paragraphs.sections_overview:
     _controller: '\Drupal\orbit_paragraphs\Controller\OrbitPageSectionsController::overview'
     _title: 'Page sections'
   requirements:
-    _permission: 'administer paragraphs types'
+    _permission: 'administer nodes'
 
 orbit_paragraphs.section_usage_modal:
   path: '/admin/structure/orbit-paragraphs/sections/{bundle}/usage'
@@ -12,5 +12,5 @@ orbit_paragraphs.section_usage_modal:
     _controller: '\Drupal\orbit_paragraphs\Controller\OrbitPageSectionsController::usageModal'
     _title_callback: '\Drupal\orbit_paragraphs\Controller\OrbitPageSectionsController::usageTitle'
   requirements:
-    _permission: 'administer paragraphs types'
+    _permission: 'administer nodes'
     bundle: '[a-z0-9_]+'
