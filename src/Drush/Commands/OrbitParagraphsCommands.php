@@ -57,6 +57,11 @@ final class OrbitParagraphsCommands extends DrushCommands
         name: 'category',
         description: 'Paragraph category IDs (comma-separated). Prompts if omitted.',
     )]
+    #[CLI\Option(
+        name: 'allow-library-conversion',
+        description: 'Allow promoting this paragraph type to the library. '
+            . 'Prompts if omitted.',
+    )]
     #[CLI\Usage(
         name: 'drush orbit-paragraphs:create',
         description: 'Prompt for a paragraph type label, description, and category.',
@@ -75,17 +80,22 @@ final class OrbitParagraphsCommands extends DrushCommands
         name: 'drush orbit-paragraphs:create "Feature" --category=text,media',
         description: 'Assign multiple categories using a comma-separated list.',
     )]
+    #[CLI\Usage(
+        name: 'drush orbit-paragraphs:create "CTA" --allow-library-conversion=0',
+        description: 'Create a paragraph type that is not addable to the library.',
+    )]
     public function createParagraphType(
         ?string $label = NULL,
         array $options = [
             'machine-name' => InputOption::VALUE_REQUIRED,
             'description' => InputOption::VALUE_OPTIONAL,
             'category' => InputOption::VALUE_OPTIONAL,
+            'allow-library-conversion' => InputOption::VALUE_OPTIONAL,
         ],
     ): void {
         $label = $label ?: $this->io()->ask(
             'Paragraph type label',
-            required: TRUE,
+            required: true,
         );
         $machine_name = $options['machine-name']
             ?: $this->machineNameFromLabel($label);
@@ -94,6 +104,28 @@ final class OrbitParagraphsCommands extends DrushCommands
             default: '',
         );
         $description = $description ?? '';
+        $allow_library_conversion = $options['allow-library-conversion'] ?? null;
+        if ($allow_library_conversion === null || $allow_library_conversion === '') {
+            $allow_library_conversion = $this->io()->confirm(
+                'Allow promoting this paragraph type to the library?',
+                true,
+            );
+        } else {
+            $parsed_allow_library_conversion = filter_var(
+                $allow_library_conversion,
+                FILTER_VALIDATE_BOOL,
+                FILTER_NULL_ON_FAILURE,
+            );
+
+            if ($parsed_allow_library_conversion === null) {
+                throw new \InvalidArgumentException(
+                    'The --allow-library-conversion option must be a boolean '
+                    . 'value such as 1, 0, true, false, yes, or no.',
+                );
+            }
+
+            $allow_library_conversion = $parsed_allow_library_conversion;
+        }
         $categories = $this->loadParagraphCategories();
         $category_ids = $this->resolveParagraphCategories(
             $options['category'] ?? NULL,
@@ -136,11 +168,24 @@ final class OrbitParagraphsCommands extends DrushCommands
             );
         }
 
+        if ($allow_library_conversion === true) {
+            $paragraph_type->setThirdPartySetting(
+                'paragraphs_library',
+                'allow_library_conversion',
+                true,
+            );
+        }
+
         $paragraph_type->save();
         $this->createParagraphFormDisplayTabs($machine_name);
 
         $message = 'Created paragraph type "' . $label . '" ('
             . $machine_name . ').';
+
+        if ($allow_library_conversion === true) {
+            $message = 'Created paragraph type "' . $label . '" ('
+                . $machine_name . ') and made it addable to the library.';
+        }
 
         if ($category_ids !== []) {
             $category_labels = [];

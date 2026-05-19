@@ -7,4 +7,5 @@ php: 8.4
 dependencies:
   - paragraphs:paragraphs
   - paragraphs_ee:paragraphs_ee
+  - entity_usage:entity_usage
   - field_group:field_group
