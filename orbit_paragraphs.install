@@ -7,11 +7,33 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Url;
+use Drupal\node\Entity\Node;
+
 /**
  * Implements hook_install().
  */
 function orbit_paragraphs_install(): void {
   orbit_paragraphs_create_default_categories();
+  orbit_paragraphs_create_dummy_page();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function orbit_paragraphs_uninstall($is_syncing) {
+  $config = \Drupal::configFactory()
+    ->getEditable('orbit_paragraphs.settings');
+  ;
+
+  // Delete dummy page.
+  $node = Node::load($config->get('dummy_page_nid'));
+  $node->delete();
+
+  // Delete/remove any config settings.
+  $config = \Drupal::configFactory()
+    ->getEditable('orbit_paragraphs.settings')
+    ->delete();
 }
 
 /**
@@ -66,4 +88,131 @@ function orbit_paragraphs_default_categories(): array {
       'label' => 'Text',
     ],
   ];
+}
+
+
+/**
+ * Create a page with some initial dummy content.
+ */
+function orbit_paragraphs_create_dummy_page() {
+
+  // Create Dummy page node and save the nid for future reference.
+  $node = Node::create([
+    'type' => 'page',
+    'title' => 'Dummy Page',
+    'uid' => 1,
+    'body' => [
+      'value' => '
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus dolor dui.</p>
+
+<p>Phasellus lobortis purus nibh. Praesent ipsum diam, suscipit a elit vel, blandit accumsan purus. Duis in lobortis nunc. In dapibus ac nunc ut malesuada. Praesent lacinia blandit magna, at suscipit urna pharetra a. Pellentesque non lacus mollis, aliquam lorem eget, dictum ex. Integer ac turpis neque. In porttitor lorem id justo pretium sodales. Quisque at velit nec ipsum luctus lacinia. Nullam non efficitur lacus. Quisque aliquam pharetra eleifend.</p>
+
+<h1>Heading 1</h1>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus dolor dui.</p>
+
+<h2>Heading 2</h2>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus dolor dui.</p>
+
+<h3>Heading 3</h3>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus dolor dui.</p>
+
+<h4>Heading 4</h4>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus dolor dui.</p>
+
+<h5>Heading 5</h5>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus dolor dui.</p>
+
+<h6>Heading 6</h6>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus dolor dui.</p>
+
+<h2>Unordered list</h2>
+
+<ul>
+	<li>List item 1</li>
+	<li>List item 2</li>
+	<li>List item 3</li>
+	<li>List item 4</li>
+</ul>
+
+<h2>Ordered list</h2>
+
+<ol>
+	<li>List item 1</li>
+	<li>List item 2</li>
+	<li>List item 3</li>
+	<li>List item 4</li>
+</ol>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus</p>
+
+<hr />
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus</p>
+
+<table border="1" cellpadding="1" cellspacing="1" summary="Table summary">
+	<caption>Table Caption</caption>
+	<thead>
+		<tr>
+			<th scope="col">Row 1 Cell 1</th>
+			<th scope="col">Row 1 Cell 2</th>
+			<th scope="col">Row 1 Cell 3</th>
+			<th scope="col">Row 1 Cell 4</th>
+			<th scope="col">Row 1 Cell 5</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Row 2 Cell 1</td>
+			<td>Row 2 Cell 5</td>
+			<td>Row 2 Cell 3</td>
+			<td>Row 2 Cell 5</td>
+			<td>Row 2 Cell 5</td>
+		</tr>
+		<tr>
+			<td>Row 3 Cell 1</td>
+			<td>Row 3 Cell 5</td>
+			<td>Row 3 Cell 3</td>
+			<td>Row 3 Cell 5</td>
+			<td>Row 3 Cell 5</td>
+		</tr>
+		<tr>
+			<td>Row 4 Cell 1</td>
+			<td>Row 4 Cell 5</td>
+			<td>Row 1 Cell 3</td>
+			<td>Row 4 Cell 5</td>
+			<td>Row 4 Cell 5</td>
+		</tr>
+		<tr>
+			<td>Row 5 Cell 1</td>
+			<td>Row 5 Cell 5</td>
+			<td>Row 5 Cell 3</td>
+			<td>Row 5 Cell 5</td>
+			<td>Row 5 Cell 5</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus viverra urna. Praesent iaculis et arcu at placerat. Proin varius, neque non scelerisque malesuada, dui urna ullamcorper libero, sit amet pharetra elit mi tincidunt odio. Nulla non accumsan felis, nec malesuada odio. Sed quam urna, gravida eu volutpat in, finibus sit amet sapien. Maecenas porta erat id lectus commodo, at vestibulum est semper. Etiam ullamcorper vel lorem ac pellentesque. In commodo sagittis ex eget aliquet. Cras vulputate ipsum tortor, quis tincidunt ipsum interdum ut. Aenean nec mollis nunc, vitae sollicitudin purus. Vivamus ac mi sit amet ante rutrum ullamcorper. Morbi viverra facilisis magna, commodo convallis justo rhoncus in. Ut at suscipit est. Nulla maximus</p>
+
+        ',
+
+      'format' => 'full_html',
+    ],
+  ]);
+  $node->save();
+
+  // Save the node ID should we need it at later stage.
+  $config = \Drupal::configFactory()->getEditable('orbit_paragraphs.settings');
+  $config->set('dummy_page_nid', $node->id());
+  $config->save(TRUE);
+
+  // Set message to show user.
+  $url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString();
+  \Drupal::messenger()
+    ->addMessage(t('<a href="@url">@link_text</a> has been created.', ['@url' => $url, '@link_text' => 'Dummy page']));
 }
