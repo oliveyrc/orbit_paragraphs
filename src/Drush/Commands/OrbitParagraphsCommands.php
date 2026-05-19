@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\orbit_paragraphs\Drush\Commands;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\paragraphs\ParagraphsTypeInterface;
 use Drupal\paragraphs_ee\ParagraphsCategoryInterface;
 use Drush\Attributes as CLI;
@@ -58,8 +60,8 @@ final class OrbitParagraphsCommands extends DrushCommands
         description: 'Paragraph category IDs (comma-separated). Prompts if omitted.',
     )]
     #[CLI\Option(
-        name: 'allow-library-conversion',
-        description: 'Allow promoting this paragraph type to the library. '
+        name: 'include-section-title',
+        description: 'Include the Section Title field on this paragraph type. '
             . 'Prompts if omitted.',
     )]
     #[CLI\Usage(
@@ -81,8 +83,8 @@ final class OrbitParagraphsCommands extends DrushCommands
         description: 'Assign multiple categories using a comma-separated list.',
     )]
     #[CLI\Usage(
-        name: 'drush orbit-paragraphs:create "CTA" --allow-library-conversion=0',
-        description: 'Create a paragraph type that is not addable to the library.',
+        name: 'drush orbit-paragraphs:create "Feature" --include-section-title=0',
+        description: 'Create the type without the Section Title field.',
     )]
     public function createParagraphType(
         ?string $label = NULL,
@@ -90,12 +92,12 @@ final class OrbitParagraphsCommands extends DrushCommands
             'machine-name' => InputOption::VALUE_REQUIRED,
             'description' => InputOption::VALUE_OPTIONAL,
             'category' => InputOption::VALUE_OPTIONAL,
-            'allow-library-conversion' => InputOption::VALUE_OPTIONAL,
+            'include-section-title' => InputOption::VALUE_OPTIONAL,
         ],
     ): void {
         $label = $label ?: $this->io()->ask(
             'Paragraph type label',
-            required: true,
+            required: TRUE,
         );
         $machine_name = $options['machine-name']
             ?: $this->machineNameFromLabel($label);
@@ -104,28 +106,12 @@ final class OrbitParagraphsCommands extends DrushCommands
             default: '',
         );
         $description = $description ?? '';
-        $allow_library_conversion = $options['allow-library-conversion'] ?? null;
-        if ($allow_library_conversion === null || $allow_library_conversion === '') {
-            $allow_library_conversion = $this->io()->confirm(
-                'Allow promoting this paragraph type to the library?',
-                true,
-            );
-        } else {
-            $parsed_allow_library_conversion = filter_var(
-                $allow_library_conversion,
-                FILTER_VALIDATE_BOOL,
-                FILTER_NULL_ON_FAILURE,
-            );
-
-            if ($parsed_allow_library_conversion === null) {
-                throw new \InvalidArgumentException(
-                    'The --allow-library-conversion option must be a boolean '
-                    . 'value such as 1, 0, true, false, yes, or no.',
-                );
-            }
-
-            $allow_library_conversion = $parsed_allow_library_conversion;
-        }
+        $include_section_title = $this->resolveBooleanOption(
+            $options['include-section-title'] ?? NULL,
+            'Include Section Title field?',
+            TRUE,
+            '--include-section-title',
+        );
         $categories = $this->loadParagraphCategories();
         $category_ids = $this->resolveParagraphCategories(
             $options['category'] ?? NULL,
@@ -168,23 +154,19 @@ final class OrbitParagraphsCommands extends DrushCommands
             );
         }
 
-        if ($allow_library_conversion === true) {
-            $paragraph_type->setThirdPartySetting(
-                'paragraphs_library',
-                'allow_library_conversion',
-                true,
-            );
-        }
-
         $paragraph_type->save();
         $this->createParagraphFormDisplayTabs($machine_name);
+
+        if ($include_section_title) {
+            $this->attachSectionTitleField($machine_name);
+        }
 
         $message = 'Created paragraph type "' . $label . '" ('
             . $machine_name . ').';
 
-        if ($allow_library_conversion === true) {
+        if ($include_section_title) {
             $message = 'Created paragraph type "' . $label . '" ('
-                . $machine_name . ') and made it addable to the library.';
+                . $machine_name . ') with Section Title field.';
         }
 
         if ($category_ids !== []) {
@@ -467,6 +449,134 @@ final class OrbitParagraphsCommands extends DrushCommands
         }
 
         return array_values(array_unique($selected_categories));
+    }
+
+    /**
+     * Resolves a boolean option value and prompts when omitted.
+     *
+     * @param mixed $value
+     *   The option value.
+     * @param string $question
+     *   The prompt question when value is omitted.
+     * @param bool $default
+     *   The prompt default.
+     * @param string $option_name
+     *   The option name used in validation errors.
+     *
+     * @return bool
+     *   The resolved boolean value.
+     */
+    protected function resolveBooleanOption(
+        mixed $value,
+        string $question,
+        bool $default,
+        string $option_name,
+    ): bool {
+        if ($value === NULL || $value === '') {
+            return $this->io()->confirm($question, $default);
+        }
+
+        $resolved = filter_var(
+            $value,
+            FILTER_VALIDATE_BOOL,
+            FILTER_NULL_ON_FAILURE,
+        );
+
+        if ($resolved === NULL) {
+            throw new \InvalidArgumentException(
+                'The ' . $option_name . ' option must be a boolean value '
+                . 'such as 1, 0, true, false, yes, or no.',
+            );
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Attaches the Section Title field to a paragraph bundle.
+     *
+     * @param string $bundle
+     *   The paragraph bundle machine name.
+     */
+    protected function attachSectionTitleField(string $bundle): void {
+        $field_name = 'field_orbit_dev_section_title';
+        $this->ensureSectionTitleFieldStorage($field_name);
+
+        if (!FieldConfig::loadByName('paragraph', $bundle, $field_name)) {
+            FieldConfig::create([
+                'field_name' => $field_name,
+                'entity_type' => 'paragraph',
+                'bundle' => $bundle,
+                'label' => 'Section Title',
+                'required' => FALSE,
+                'translatable' => TRUE,
+                'settings' => [],
+            ])->save();
+        }
+
+        $form_display_storage = $this->entityTypeManager->getStorage('entity_form_display');
+        $form_display_id = 'paragraph.' . $bundle . '.default';
+        $form_display = $form_display_storage->load($form_display_id);
+
+        if ($form_display !== NULL) {
+            $field_component = (array) $form_display->getComponent($field_name);
+            $field_parent = (string) ($field_component['third_party_settings']['field_group']['parent_name'] ?? '');
+
+            if ($field_component === [] || $field_parent !== 'group_content') {
+                $form_display->setComponent($field_name, [
+                    'type' => 'string_textfield',
+                    'weight' => -10,
+                    'region' => 'content',
+                    'settings' => [
+                        'size' => 60,
+                        'placeholder' => '',
+                    ],
+                    'third_party_settings' => [
+                        'field_group' => [
+                            'parent_name' => 'group_content',
+                        ],
+                    ],
+                ]);
+
+                $third_party_settings = (array) $form_display->get('third_party_settings');
+                $field_group_settings = (array) ($third_party_settings['field_group'] ?? []);
+                $group_content_children = (array) ($field_group_settings['group_content']['children'] ?? []);
+
+                if (!in_array($field_name, $group_content_children, TRUE)) {
+                    $group_content_children[] = $field_name;
+                    $field_group_settings['group_content']['children'] = $group_content_children;
+                    $third_party_settings['field_group'] = $field_group_settings;
+                    $form_display->set('third_party_settings', $third_party_settings);
+                }
+
+                $form_display->save();
+            }
+        }
+    }
+
+    /**
+     * Ensures Section Title field storage exists.
+     *
+     * @param string $field_name
+     *   The field machine name.
+     */
+    protected function ensureSectionTitleFieldStorage(string $field_name): void {
+        if (FieldStorageConfig::loadByName('paragraph', $field_name) !== NULL) {
+            return;
+        }
+
+        FieldStorageConfig::create([
+            'field_name' => $field_name,
+            'entity_type' => 'paragraph',
+            'type' => 'string',
+            'cardinality' => 1,
+            'translatable' => TRUE,
+            'settings' => [
+                'max_length' => 255,
+                'is_ascii' => FALSE,
+                'case_sensitive' => FALSE,
+            ],
+        ])->save();
     }
 
     /**

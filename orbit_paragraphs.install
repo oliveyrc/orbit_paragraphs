@@ -24,7 +24,6 @@ function orbit_paragraphs_install(): void {
 function orbit_paragraphs_uninstall($is_syncing) {
   $config = \Drupal::configFactory()
     ->getEditable('orbit_paragraphs.settings');
-  ;
 
   // Delete dummy page.
   $node = Node::load($config->get('dummy_page_nid'));
@@ -89,7 +88,6 @@ function orbit_paragraphs_default_categories(): array {
     ],
   ];
 }
-
 
 /**
  * Create a page with some initial dummy content.
