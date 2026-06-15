@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ *
+ * Https://www.drupal.org/docs/theming-drupal/twig-in-drupal/create-custom-twig-templates-for-custom-module.
+ */
+function orbit_paragraphs_text_theme($existing, $type, $theme, $path): array {
+  return [
+    'paragraph__orbit_paragraphs_text' => [
+      'render element' => 'elements',
+      'base hook' => 'paragraph',
+    ],
+  ];
+}

@@ -15,9 +15,10 @@ use Drupal\paragraphs\Entity\ParagraphsType;
 /**
  * Implements hook_install().
  */
-function orbit_paragraphs_image_install(): void {
+function orbit_paragraphs_text_install(): void {
   orbit_paragraphs_set_paragraph_type_icon(
-    'orbit_paragraphs_inline_image',
-    \Drupal::service('extension.list.module')->getPath('orbit_paragraphs_image') . '/assets/thumbnail.png',
+    'orbit_paragraphs_text',
+    \Drupal::service('extension.list.module')->getPath('orbit_paragraphs_text') . '/assets/thumbnail.png',
   );
 }
+

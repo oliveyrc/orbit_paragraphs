@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_orbit_pt_section_text
+    - paragraphs.paragraphs_type.orbit_paragraphs_text
+  module:
+    - text
+id: paragraph.orbit_paragraphs_text.field_orbit_pt_section_text
+field_name: field_orbit_pt_section_text
+entity_type: paragraph
+bundle: orbit_paragraphs_text
+label: 'Section Text'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long
