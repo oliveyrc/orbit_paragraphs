@@ -5,6 +5,7 @@ package: Orbit
 core_version_requirement: ^11
 php: 8.4
 dependencies:
+  - drupal:text
   - paragraphs:paragraphs
   - paragraphs_ee:paragraphs_ee
   - entity_usage:entity_usage

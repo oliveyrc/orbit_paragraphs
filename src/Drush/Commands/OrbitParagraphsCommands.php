@@ -64,6 +64,11 @@ final class OrbitParagraphsCommands extends DrushCommands
         description: 'Include the Section Title field on this paragraph type. '
             . 'Prompts if omitted.',
     )]
+    #[CLI\Option(
+        name: 'include-section-text',
+        description: 'Include the Section Text field on this paragraph type. '
+            . 'Prompts if omitted.',
+    )]
     #[CLI\Usage(
         name: 'drush orbit-paragraphs:create',
         description: 'Prompt for a paragraph type label, description, and category.',
@@ -86,6 +91,10 @@ final class OrbitParagraphsCommands extends DrushCommands
         name: 'drush orbit-paragraphs:create "Feature" --include-section-title=0',
         description: 'Create the type without the Section Title field.',
     )]
+    #[CLI\Usage(
+        name: 'drush orbit-paragraphs:create "Feature" --include-section-text=0',
+        description: 'Create the type without the Section Text field.',
+    )]
     public function createParagraphType(
         ?string $label = NULL,
         array $options = [
@@ -93,6 +102,7 @@ final class OrbitParagraphsCommands extends DrushCommands
             'description' => InputOption::VALUE_OPTIONAL,
             'category' => InputOption::VALUE_OPTIONAL,
             'include-section-title' => InputOption::VALUE_OPTIONAL,
+            'include-section-text' => InputOption::VALUE_OPTIONAL,
         ],
     ): void {
         $label = $label ?: $this->io()->ask(
@@ -111,6 +121,12 @@ final class OrbitParagraphsCommands extends DrushCommands
             'Include Section Title field?',
             TRUE,
             '--include-section-title',
+        );
+        $include_section_text = $this->resolveBooleanOption(
+            $options['include-section-text'] ?? NULL,
+            'Include Section Text field?',
+            TRUE,
+            '--include-section-text',
         );
         $categories = $this->loadParagraphCategories();
         $category_ids = $this->resolveParagraphCategories(
@@ -161,12 +177,30 @@ final class OrbitParagraphsCommands extends DrushCommands
             $this->attachSectionTitleField($machine_name);
         }
 
+        if ($include_section_text) {
+            $this->attachSectionTextField($machine_name);
+        }
+
+        $this->normalizeFormDisplayFieldGroupParents(
+            $machine_name,
+            $include_section_title,
+            $include_section_text,
+        );
+
         $message = 'Created paragraph type "' . $label . '" ('
             . $machine_name . ').';
 
-        if ($include_section_title) {
+        if ($include_section_title && $include_section_text) {
+            $message = 'Created paragraph type "' . $label . '" ('
+                . $machine_name . ') with Section Title and Section Text fields.';
+        }
+        elseif ($include_section_title) {
             $message = 'Created paragraph type "' . $label . '" ('
                 . $machine_name . ') with Section Title field.';
+        }
+        elseif ($include_section_text) {
+            $message = 'Created paragraph type "' . $label . '" ('
+                . $machine_name . ') with Section Text field.';
         }
 
         if ($category_ids !== []) {
@@ -234,21 +268,32 @@ final class OrbitParagraphsCommands extends DrushCommands
         }
 
         $status_component = (array) $form_display->getComponent('status');
-        $status_component_parent = (string) ($status_component['third_party_settings']['field_group']['parent_name'] ?? '');
-        if ($status_component === [] || $status_component_parent !== 'group_settings') {
-            $form_display->setComponent('status', [
+        $status_component_changed = FALSE;
+
+        if ($status_component === []) {
+            $status_component = [
                 'type' => 'boolean_checkbox',
                 'weight' => 120,
                 'region' => 'content',
                 'settings' => [
                     'display_label' => TRUE,
                 ],
-                'third_party_settings' => [
-                    'field_group' => [
-                        'parent_name' => 'group_settings',
-                    ],
-                ],
-            ]);
+                'third_party_settings' => [],
+            ];
+            $status_component_changed = TRUE;
+        }
+
+        $status_component_third_party_settings = (array) ($status_component['third_party_settings'] ?? []);
+        $status_component_field_group_settings = (array) ($status_component_third_party_settings['field_group'] ?? []);
+        if (($status_component_field_group_settings['parent_name'] ?? '') !== 'group_settings') {
+            $status_component_field_group_settings['parent_name'] = 'group_settings';
+            $status_component_third_party_settings['field_group'] = $status_component_field_group_settings;
+            $status_component['third_party_settings'] = $status_component_third_party_settings;
+            $status_component_changed = TRUE;
+        }
+
+        if ($status_component_changed) {
+            $form_display->setComponent('status', $status_component);
             $changed = TRUE;
         }
 
@@ -499,7 +544,7 @@ final class OrbitParagraphsCommands extends DrushCommands
      *   The paragraph bundle machine name.
      */
     protected function attachSectionTitleField(string $bundle): void {
-        $field_name = 'field_orbit_dev_section_title';
+        $field_name = 'field_orbit_pt_section_title';
         $this->ensureSectionTitleFieldStorage($field_name);
 
         if (!FieldConfig::loadByName('paragraph', $bundle, $field_name)) {
@@ -519,11 +564,10 @@ final class OrbitParagraphsCommands extends DrushCommands
         $form_display = $form_display_storage->load($form_display_id);
 
         if ($form_display !== NULL) {
+            $changed = FALSE;
             $field_component = (array) $form_display->getComponent($field_name);
-            $field_parent = (string) ($field_component['third_party_settings']['field_group']['parent_name'] ?? '');
-
-            if ($field_component === [] || $field_parent !== 'group_content') {
-                $form_display->setComponent($field_name, [
+            if ($field_component === []) {
+                $field_component = [
                     'type' => 'string_textfield',
                     'weight' => -10,
                     'region' => 'content',
@@ -531,24 +575,113 @@ final class OrbitParagraphsCommands extends DrushCommands
                         'size' => 60,
                         'placeholder' => '',
                     ],
-                    'third_party_settings' => [
-                        'field_group' => [
-                            'parent_name' => 'group_content',
-                        ],
+                    'third_party_settings' => [],
+                ];
+                $changed = TRUE;
+            }
+
+            $field_third_party_settings = (array) ($field_component['third_party_settings'] ?? []);
+            $field_group_component_settings = (array) ($field_third_party_settings['field_group'] ?? []);
+
+            if (($field_group_component_settings['parent_name'] ?? '') !== 'group_content') {
+                $field_group_component_settings['parent_name'] = 'group_content';
+                $field_third_party_settings['field_group'] = $field_group_component_settings;
+                $field_component['third_party_settings'] = $field_third_party_settings;
+                $changed = TRUE;
+            }
+
+            if ($changed) {
+                $form_display->setComponent($field_name, $field_component);
+            }
+
+            $third_party_settings = (array) $form_display->get('third_party_settings');
+            $field_group_settings = (array) ($third_party_settings['field_group'] ?? []);
+            $group_content_children = (array) ($field_group_settings['group_content']['children'] ?? []);
+
+            if (!in_array($field_name, $group_content_children, TRUE)) {
+                $group_content_children[] = $field_name;
+                $field_group_settings['group_content']['children'] = $group_content_children;
+                $third_party_settings['field_group'] = $field_group_settings;
+                $form_display->set('third_party_settings', $third_party_settings);
+                $changed = TRUE;
+            }
+
+            if ($changed) {
+                $form_display->save();
+            }
+        }
+    }
+
+    /**
+     * Attaches the Section Text field to a paragraph bundle.
+     *
+     * @param string $bundle
+     *   The paragraph bundle machine name.
+     */
+    protected function attachSectionTextField(string $bundle): void {
+        $field_name = 'field_orbit_pt_section_text';
+        $this->ensureSectionTextFieldStorage($field_name);
+
+        if (!FieldConfig::loadByName('paragraph', $bundle, $field_name)) {
+            FieldConfig::create([
+                'field_name' => $field_name,
+                'entity_type' => 'paragraph',
+                'bundle' => $bundle,
+                'label' => 'Section Text',
+                'required' => FALSE,
+                'translatable' => TRUE,
+                'settings' => [],
+            ])->save();
+        }
+
+        $form_display_storage = $this->entityTypeManager->getStorage('entity_form_display');
+        $form_display_id = 'paragraph.' . $bundle . '.default';
+        $form_display = $form_display_storage->load($form_display_id);
+
+        if ($form_display !== NULL) {
+            $changed = FALSE;
+            $field_component = (array) $form_display->getComponent($field_name);
+            if ($field_component === []) {
+                $field_component = [
+                    'type' => 'text_textarea',
+                    'weight' => -9,
+                    'region' => 'content',
+                    'settings' => [
+                        'rows' => 5,
+                        'placeholder' => '',
                     ],
-                ]);
+                    'third_party_settings' => [],
+                ];
+                $changed = TRUE;
+            }
 
-                $third_party_settings = (array) $form_display->get('third_party_settings');
-                $field_group_settings = (array) ($third_party_settings['field_group'] ?? []);
-                $group_content_children = (array) ($field_group_settings['group_content']['children'] ?? []);
+            $field_third_party_settings = (array) ($field_component['third_party_settings'] ?? []);
+            $field_group_component_settings = (array) ($field_third_party_settings['field_group'] ?? []);
 
-                if (!in_array($field_name, $group_content_children, TRUE)) {
-                    $group_content_children[] = $field_name;
-                    $field_group_settings['group_content']['children'] = $group_content_children;
-                    $third_party_settings['field_group'] = $field_group_settings;
-                    $form_display->set('third_party_settings', $third_party_settings);
-                }
+            if (($field_group_component_settings['parent_name'] ?? '') !== 'group_content') {
+                $field_group_component_settings['parent_name'] = 'group_content';
+                $field_third_party_settings['field_group'] = $field_group_component_settings;
+                $field_component['third_party_settings'] = $field_third_party_settings;
+                $changed = TRUE;
+            }
 
+            if ($changed) {
+                $form_display->setComponent($field_name, $field_component);
+            }
+
+            $third_party_settings = (array) $form_display->get('third_party_settings');
+            $field_group_settings = (array) ($third_party_settings['field_group'] ?? []);
+            $group_content_children = (array) ($field_group_settings['group_content']['children'] ?? []);
+
+            if (!in_array($field_name, $group_content_children, TRUE)) {
+                $group_content_children[] = $field_name;
+                $field_group_settings['group_content']['children'] = $group_content_children;
+                $third_party_settings['field_group'] = $field_group_settings;
+                $form_display->set('third_party_settings', $third_party_settings);
+                $changed = TRUE;
+            }
+
+            if ($changed) {
                 $form_display->save();
             }
         }
@@ -577,6 +710,150 @@ final class OrbitParagraphsCommands extends DrushCommands
                 'case_sensitive' => FALSE,
             ],
         ])->save();
+    }
+
+    /**
+     * Ensures Section Text field storage exists.
+     *
+     * @param string $field_name
+     *   The field machine name.
+     */
+    protected function ensureSectionTextFieldStorage(string $field_name): void {
+        if (FieldStorageConfig::loadByName('paragraph', $field_name) !== NULL) {
+            return;
+        }
+
+        FieldStorageConfig::create([
+            'field_name' => $field_name,
+            'entity_type' => 'paragraph',
+            'type' => 'text_long',
+            'cardinality' => 1,
+            'translatable' => TRUE,
+            'settings' => [],
+        ])->save();
+    }
+
+    /**
+     * Normalizes field_group parent settings on form display components.
+     *
+     * @param string $bundle
+     *   The paragraph bundle machine name.
+     * @param bool $include_section_title
+     *   Whether section title was requested.
+     * @param bool $include_section_text
+     *   Whether section text was requested.
+     */
+    protected function normalizeFormDisplayFieldGroupParents(
+        string $bundle,
+        bool $include_section_title,
+        bool $include_section_text,
+    ): void {
+        $form_display_storage = $this->entityTypeManager->getStorage('entity_form_display');
+        $form_display_id = 'paragraph.' . $bundle . '.default';
+        $form_display = $form_display_storage->load($form_display_id);
+
+        if ($form_display === NULL) {
+            return;
+        }
+
+        $changed = FALSE;
+        $changed = $this->normalizeComponentFieldGroupParent(
+            $form_display,
+            'status',
+            'group_settings',
+            [
+                'type' => 'boolean_checkbox',
+                'weight' => 120,
+                'region' => 'content',
+                'settings' => [
+                    'display_label' => TRUE,
+                ],
+            ],
+        ) || $changed;
+
+        if ($include_section_title) {
+            $changed = $this->normalizeComponentFieldGroupParent(
+                $form_display,
+                'field_orbit_pt_section_title',
+                'group_content',
+                [
+                    'type' => 'string_textfield',
+                    'weight' => -10,
+                    'region' => 'content',
+                    'settings' => [
+                        'size' => 60,
+                        'placeholder' => '',
+                    ],
+                ],
+            ) || $changed;
+        }
+
+        if ($include_section_text) {
+            $changed = $this->normalizeComponentFieldGroupParent(
+                $form_display,
+                'field_orbit_pt_section_text',
+                'group_content',
+                [
+                    'type' => 'text_textarea',
+                    'weight' => -9,
+                    'region' => 'content',
+                    'settings' => [
+                        'rows' => 5,
+                        'placeholder' => '',
+                    ],
+                ],
+            ) || $changed;
+        }
+
+        if ($changed) {
+            $form_display->save();
+        }
+    }
+
+    /**
+     * Ensures a form display component has a field_group parent_name.
+     *
+     * @param object $form_display
+     *   The form display config entity.
+     * @param string $component_name
+     *   The component machine name in form display content.
+     * @param string $parent_name
+     *   The expected field group parent machine name.
+     * @param array<string, mixed> $default_component
+     *   Default component settings when missing.
+     *
+     * @return bool
+     *   TRUE when a change was applied.
+     */
+    protected function normalizeComponentFieldGroupParent(
+        object $form_display,
+        string $component_name,
+        string $parent_name,
+        array $default_component,
+    ): bool {
+        $component = (array) $form_display->getComponent($component_name);
+        $changed = FALSE;
+
+        if ($component === []) {
+            $component = $default_component;
+            $changed = TRUE;
+        }
+
+        $component_third_party_settings = (array) ($component['third_party_settings'] ?? []);
+        $component_field_group = (array) ($component_third_party_settings['field_group'] ?? []);
+
+        if (($component_field_group['parent_name'] ?? '') !== $parent_name) {
+            $component_field_group['parent_name'] = $parent_name;
+            $component_third_party_settings['field_group'] = $component_field_group;
+            $component['third_party_settings'] = $component_third_party_settings;
+            $changed = TRUE;
+        }
+
+        if ($changed) {
+            $form_display->setComponent($component_name, $component);
+        }
+
+        return $changed;
     }
 
     /**

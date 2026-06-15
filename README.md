@@ -16,6 +16,8 @@ Orbit Paragraphs is a custom Drupal 11 module that provides common Paragraph fie
 - Interactive Paragraph bundle creation via Drush.
 - Paragraph category tagging using Paragraphs Editor Enhancements.
 - Multiple categories can be assigned in one command (optional with default "None" option).
+- Optional Section Title field on creation (enabled by default).
+- Optional Section Text field on creation (enabled by default).
 - Automatic Field Group setup on the bundle manage form display.
 - Field Group parent tab: Tabs.
 - Field Group child tab: Content.
@@ -58,11 +60,25 @@ Create a Paragraph type and assign multiple categories:
 drush orbit-paragraphs:create "Feature Grid" --category=text,media,news
 ```
 
+Create a Paragraph type without the default Section Title field:
+
+```bash
+drush orbit-paragraphs:create "Feature" --include-section-title=0
+```
+
+Create a Paragraph type without the default Section Text field:
+
+```bash
+drush orbit-paragraphs:create "Feature" --include-section-text=0
+```
+
 When no category is provided, the command prompts you to select one or more categories, with a
 default option for no category.
 After creation, the command also configures the bundle's default paragraph form display with a
 Tabs wrapper containing Content and Settings child tabs.
 The published checkbox is automatically placed in the Settings tab.
+The command also prompts for both Section Title and Section Text field inclusion when those
+options are omitted.
 
 ## Admin Pages
 
