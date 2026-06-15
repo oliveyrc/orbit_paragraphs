@@ -20,6 +20,11 @@ final class OrbitParagraphsCommands extends DrushCommands
 {
 
     /**
+     * Maximum safe paragraph bundle machine name length for generated config.
+     */
+    protected const MAX_MACHINE_NAME_LENGTH = 127;
+
+    /**
      * Constructs an OrbitParagraphsCommands object.
      *
      * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -49,7 +54,7 @@ final class OrbitParagraphsCommands extends DrushCommands
     )]
     #[CLI\Option(
         name: 'machine-name',
-        description: 'Machine name. Defaults from the label.',
+        description: 'Machine name, up to 127 characters. Prompts with a default generated from the label.',
     )]
     #[CLI\Option(
         name: 'description',
@@ -75,7 +80,7 @@ final class OrbitParagraphsCommands extends DrushCommands
     )]
     #[CLI\Usage(
         name: 'drush orbit-paragraphs:create "Hero Banner"',
-        description: 'Use the label and prompt for the description and category.',
+        description: 'Use the label and prompt for the machine name, description, and category.',
     )]
     #[CLI\Usage(
         name: 'drush orbit-paragraphs:create "CTA" --machine-name=cta '
@@ -110,7 +115,11 @@ final class OrbitParagraphsCommands extends DrushCommands
             required: TRUE,
         );
         $machine_name = $options['machine-name']
-            ?: $this->machineNameFromLabel($label);
+            ?: $this->io()->ask(
+                'Paragraph type machine name',
+                $this->machineNameFromLabel($label),
+            );
+        $machine_name = trim((string) $machine_name);
         $description = $options['description'] ?? $this->io()->ask(
             'Paragraph type description',
             default: '',
@@ -134,12 +143,7 @@ final class OrbitParagraphsCommands extends DrushCommands
             $categories,
         );
 
-        if (!preg_match('/^[a-z0-9_]+$/', $machine_name)) {
-            throw new \InvalidArgumentException(
-                'The machine name "' . $machine_name . '" must contain only '
-                . 'lowercase letters, numbers, and underscores.',
-            );
-        }
+        $this->validateMachineName($machine_name);
 
         $storage = $this->entityTypeManager->getStorage('paragraphs_type');
 
@@ -826,6 +830,35 @@ final class OrbitParagraphsCommands extends DrushCommands
         }
 
         return $machine_name;
+    }
+
+    /**
+     * Validates a paragraph type machine name.
+     *
+     * @param string $machine_name
+     *   The machine name to validate.
+     */
+    protected function validateMachineName(string $machine_name): void {
+        if ($machine_name === '') {
+            throw new \InvalidArgumentException(
+                'The machine name cannot be empty.',
+            );
+        }
+
+        if (strlen($machine_name) > static::MAX_MACHINE_NAME_LENGTH) {
+            throw new \InvalidArgumentException(
+                'The machine name "' . $machine_name . '" is '
+                . strlen($machine_name) . ' characters long. It must be '
+                . static::MAX_MACHINE_NAME_LENGTH . ' characters or fewer.',
+            );
+        }
+
+        if (!preg_match('/^[a-z0-9_]+$/', $machine_name)) {
+            throw new \InvalidArgumentException(
+                'The machine name "' . $machine_name . '" must contain only '
+                . 'lowercase letters, numbers, and underscores.',
+            );
+        }
     }
 
 }

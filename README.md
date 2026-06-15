@@ -36,7 +36,7 @@ Create a new Paragraph type interactively:
 drush orbit-paragraphs:create
 ```
 
-Create a new Paragraph type with a supplied label and prompted description:
+Create a new Paragraph type with a supplied label and prompted machine name and description:
 
 ```bash
 drush orbit-paragraphs:create "Hero Banner"
@@ -74,6 +74,9 @@ drush orbit-paragraphs:create "Feature" --include-section-text=0
 
 When no category is provided, the command prompts you to select one or more categories, with a
 default option for no category.
+When no machine name is provided, the command prompts with a default generated from the label so
+you can accept it or enter a different one. Machine names must use lowercase letters, numbers, and
+underscores, and must be 127 characters or fewer.
 After creation, the command also configures the bundle's default paragraph form display with a
 Tabs wrapper containing Content and Settings child tabs.
 The published checkbox is automatically placed in the Settings tab.
