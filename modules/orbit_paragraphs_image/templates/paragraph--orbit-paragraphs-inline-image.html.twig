@@ -1,0 +1,28 @@
+{{ attach_library('scaffold/paragraph.inline_image') }}
+{% set classes = [
+  'p',
+  'pt--' ~ paragraph.bundle|clean_class,
+  view_mode ? 'paragraph--view-mode--' ~ view_mode|clean_class,
+  not paragraph.isPublished() ? 'paragraph--unpublished',
+  remove_margin_bottom
+] %}
+{% block paragraph %}
+	<section{{attributes.addClass(classes)}}>
+    {% if not paragraph.field_orbit_pt_section_title.isEmpty() %}
+			<header>
+          <h2>{{ content.field_orbit_pt_section_title.0 }}</h2>
+			</header>
+		{% endif %}
+{% if not paragraph.field_orbit_pt_section_text.isEmpty() %}
+	<div class="intro">{{ content.field_orbit_pt_section_text.0 }}</div>
+{% endif %}
+
+
+		{% block content %}
+{{ content|without('field_oyster_pt_admin_desc','field_orbit_pt_section_title','field_orbit_pt_section_text') }}
+
+		{% endblock %}
+
+	</section>
+{% endblock paragraph %}
+

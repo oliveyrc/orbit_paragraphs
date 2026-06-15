@@ -6,6 +6,8 @@ dependencies:
     - field.field.paragraph.orbit_paragraphs_inline_image.field_orbit_pt_section_text
     - field.field.paragraph.orbit_paragraphs_inline_image.field_orbit_pt_section_title
     - paragraphs.paragraphs_type.orbit_paragraphs_inline_image
+  module:
+    - text
 id: paragraph.orbit_paragraphs_inline_image.default
 targetEntityType: paragraph
 bundle: orbit_paragraphs_inline_image
@@ -18,8 +20,21 @@ content:
       view_mode: inline_image
       link: false
     third_party_settings: {  }
+    weight: 2
+    region: content
+  field_orbit_pt_section_text:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_orbit_pt_section_title:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
     weight: 0
     region: content
-hidden:
-  field_orbit_pt_section_text: true
-  field_orbit_pt_section_title: true
+hidden: {  }

@@ -13,11 +13,9 @@ declare(strict_types=1);
  */
 function orbit_paragraphs_image_theme($existing, $type, $theme, $path): array {
   return [
-    'paragraph__image_grid' => [
+    'paragraph__orbit_paragraphs_inline_image' => [
       'render element' => 'elements',
       'base hook' => 'paragraph',
     ],
-
-
   ];
 }
