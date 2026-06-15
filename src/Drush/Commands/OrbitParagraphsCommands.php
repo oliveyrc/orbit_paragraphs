@@ -22,7 +22,7 @@ final class OrbitParagraphsCommands extends DrushCommands
     /**
      * Maximum safe paragraph bundle machine name length for generated config.
      */
-    protected const MAX_MACHINE_NAME_LENGTH = 127;
+    protected const MAX_MACHINE_NAME_LENGTH = 32;
 
     /**
      * Constructs an OrbitParagraphsCommands object.
