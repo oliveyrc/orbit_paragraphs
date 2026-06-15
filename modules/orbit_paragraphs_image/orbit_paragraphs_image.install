@@ -1,0 +1,71 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for Orbit Paragraphs Image.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\file\Entity\File;
+use Drupal\file\FileInterface;
+use Drupal\paragraphs\Entity\ParagraphsType;
+
+/**
+ * Implements hook_install().
+ */
+function orbit_paragraphs_image_install(): void {
+  orbit_paragraphs_image_set_paragraph_type_icon(
+    'orbit_paragraphs_inline_image',
+    \Drupal::service('extension.list.module')->getPath('orbit_paragraphs_image') . '/assets/thumbnail.png',
+  );
+}
+
+/**
+ * Saves the module thumbnail as the icon for a paragraph type.
+ *
+ * @param string $paragraph_type_id
+ *   The paragraph type machine name.
+ * @param string $thumbnail_path
+ *   Absolute path to the thumbnail PNG on disk.
+ */
+function orbit_paragraphs_image_set_paragraph_type_icon(string $paragraph_type_id, string $thumbnail_path): void {
+  $paragraph_type = \Drupal::entityTypeManager()
+    ->getStorage('paragraphs_type')
+    ->load($paragraph_type_id);
+
+  if (!$paragraph_type instanceof ParagraphsType) {
+    return;
+  }
+
+  $image_data = file_get_contents($thumbnail_path);
+  if ($image_data === FALSE) {
+    return;
+  }
+
+  /** @var \Drupal\Core\File\FileSystemInterface $filesystem */
+  $filesystem = \Drupal::service('file_system');
+  $upload_path = 'public://paragraphs_type_icon/';
+  $filesystem->prepareDirectory($upload_path, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+
+  $destination = $upload_path . $paragraph_type_id . '-icon.png';
+  $file_uri = $filesystem->saveData($image_data, $destination, FileSystemInterface::EXISTS_REPLACE);
+  if ($file_uri === FALSE) {
+    return;
+  }
+
+  $file = File::create([
+    'uri' => $file_uri,
+    'uid' => 1,
+    'status' => FileInterface::STATUS_PERMANENT,
+  ]);
+  $file->save();
+
+  /** @var \Drupal\file\FileUsage\FileUsageInterface $file_usage */
+  $file_usage = \Drupal::service('file.usage');
+  $file_usage->add($file, 'paragraphs', 'paragraphs_type', $paragraph_type->id());
+
+  $paragraph_type->icon_uuid = $file->uuid();
+  $paragraph_type->save();
+}

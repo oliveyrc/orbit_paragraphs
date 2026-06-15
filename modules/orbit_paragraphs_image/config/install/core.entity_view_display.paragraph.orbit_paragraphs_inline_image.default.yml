@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.orbit_paragraphs_inline_image.field_orbit_pt_images
+    - field.field.paragraph.orbit_paragraphs_inline_image.field_orbit_pt_section_text
+    - field.field.paragraph.orbit_paragraphs_inline_image.field_orbit_pt_section_title
+    - paragraphs.paragraphs_type.orbit_paragraphs_inline_image
+id: paragraph.orbit_paragraphs_inline_image.default
+targetEntityType: paragraph
+bundle: orbit_paragraphs_inline_image
+mode: default
+content:
+  field_orbit_pt_images:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: inline_image
+      link: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  field_orbit_pt_section_text: true
+  field_orbit_pt_section_title: true

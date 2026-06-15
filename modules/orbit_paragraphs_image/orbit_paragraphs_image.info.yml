@@ -1,0 +1,8 @@
+name: Image
+type: module
+description: Provide a set of image related paragraph bundles for use in Orbit builds.
+core_version_requirement:  ^11
+dependencies:
+  - orbit_paragraphs:orbit_paragraphs
+  - orbit_media:orbit_media
+package: Orbit Paragraphs

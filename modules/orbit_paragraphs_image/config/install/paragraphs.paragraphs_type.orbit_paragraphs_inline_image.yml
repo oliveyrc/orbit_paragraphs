@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs_ee
+third_party_settings:
+  paragraphs_ee:
+    paragraphs_categories:
+      - media
+      - text
+id: orbit_paragraphs_inline_image
+label: 'Inline Image'
+icon_uuid: null
+icon_default: null
+description: 'Inline image with optioal title and intro paragraph.'
+behavior_plugins: {  }
