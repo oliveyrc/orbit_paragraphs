@@ -278,17 +278,7 @@ final class OrbitParagraphsCommands extends DrushCommands
                 'settings' => [
                     'display_label' => TRUE,
                 ],
-                'third_party_settings' => [],
             ];
-            $status_component_changed = TRUE;
-        }
-
-        $status_component_third_party_settings = (array) ($status_component['third_party_settings'] ?? []);
-        $status_component_field_group_settings = (array) ($status_component_third_party_settings['field_group'] ?? []);
-        if (($status_component_field_group_settings['parent_name'] ?? '') !== 'group_settings') {
-            $status_component_field_group_settings['parent_name'] = 'group_settings';
-            $status_component_third_party_settings['field_group'] = $status_component_field_group_settings;
-            $status_component['third_party_settings'] = $status_component_third_party_settings;
             $status_component_changed = TRUE;
         }
 
@@ -575,18 +565,7 @@ final class OrbitParagraphsCommands extends DrushCommands
                         'size' => 60,
                         'placeholder' => '',
                     ],
-                    'third_party_settings' => [],
                 ];
-                $changed = TRUE;
-            }
-
-            $field_third_party_settings = (array) ($field_component['third_party_settings'] ?? []);
-            $field_group_component_settings = (array) ($field_third_party_settings['field_group'] ?? []);
-
-            if (($field_group_component_settings['parent_name'] ?? '') !== 'group_content') {
-                $field_group_component_settings['parent_name'] = 'group_content';
-                $field_third_party_settings['field_group'] = $field_group_component_settings;
-                $field_component['third_party_settings'] = $field_third_party_settings;
                 $changed = TRUE;
             }
 
@@ -650,18 +629,7 @@ final class OrbitParagraphsCommands extends DrushCommands
                         'rows' => 5,
                         'placeholder' => '',
                     ],
-                    'third_party_settings' => [],
                 ];
-                $changed = TRUE;
-            }
-
-            $field_third_party_settings = (array) ($field_component['third_party_settings'] ?? []);
-            $field_group_component_settings = (array) ($field_third_party_settings['field_group'] ?? []);
-
-            if (($field_group_component_settings['parent_name'] ?? '') !== 'group_content') {
-                $field_group_component_settings['parent_name'] = 'group_content';
-                $field_third_party_settings['field_group'] = $field_group_component_settings;
-                $field_component['third_party_settings'] = $field_third_party_settings;
                 $changed = TRUE;
             }
 
@@ -734,7 +702,7 @@ final class OrbitParagraphsCommands extends DrushCommands
     }
 
     /**
-     * Normalizes field_group parent settings on form display components.
+     * Ensures expected form display components exist.
      *
      * @param string $bundle
      *   The paragraph bundle machine name.
@@ -757,10 +725,9 @@ final class OrbitParagraphsCommands extends DrushCommands
         }
 
         $changed = FALSE;
-        $changed = $this->normalizeComponentFieldGroupParent(
+        $changed = $this->ensureFormDisplayComponent(
             $form_display,
             'status',
-            'group_settings',
             [
                 'type' => 'boolean_checkbox',
                 'weight' => 120,
@@ -772,10 +739,9 @@ final class OrbitParagraphsCommands extends DrushCommands
         ) || $changed;
 
         if ($include_section_title) {
-            $changed = $this->normalizeComponentFieldGroupParent(
+            $changed = $this->ensureFormDisplayComponent(
                 $form_display,
                 'field_orbit_pt_section_title',
-                'group_content',
                 [
                     'type' => 'string_textfield',
                     'weight' => -10,
@@ -789,10 +755,9 @@ final class OrbitParagraphsCommands extends DrushCommands
         }
 
         if ($include_section_text) {
-            $changed = $this->normalizeComponentFieldGroupParent(
+            $changed = $this->ensureFormDisplayComponent(
                 $form_display,
                 'field_orbit_pt_section_text',
-                'group_content',
                 [
                     'type' => 'text_textarea',
                     'weight' => -9,
@@ -811,49 +776,32 @@ final class OrbitParagraphsCommands extends DrushCommands
     }
 
     /**
-     * Ensures a form display component has a field_group parent_name.
+     * Ensures a form display component exists.
      *
      * @param object $form_display
      *   The form display config entity.
      * @param string $component_name
      *   The component machine name in form display content.
-     * @param string $parent_name
-     *   The expected field group parent machine name.
      * @param array<string, mixed> $default_component
      *   Default component settings when missing.
      *
      * @return bool
      *   TRUE when a change was applied.
      */
-    protected function normalizeComponentFieldGroupParent(
+    protected function ensureFormDisplayComponent(
         object $form_display,
         string $component_name,
-        string $parent_name,
         array $default_component,
     ): bool {
         $component = (array) $form_display->getComponent($component_name);
-        $changed = FALSE;
 
-        if ($component === []) {
-            $component = $default_component;
-            $changed = TRUE;
+        if ($component !== []) {
+            return FALSE;
         }
 
-        $component_third_party_settings = (array) ($component['third_party_settings'] ?? []);
-        $component_field_group = (array) ($component_third_party_settings['field_group'] ?? []);
+        $form_display->setComponent($component_name, $default_component);
 
-        if (($component_field_group['parent_name'] ?? '') !== $parent_name) {
-            $component_field_group['parent_name'] = $parent_name;
-            $component_third_party_settings['field_group'] = $component_field_group;
-            $component['third_party_settings'] = $component_third_party_settings;
-            $changed = TRUE;
-        }
-
-        if ($changed) {
-            $form_display->setComponent($component_name, $component);
-        }
-
-        return $changed;
+        return TRUE;
     }
 
     /**

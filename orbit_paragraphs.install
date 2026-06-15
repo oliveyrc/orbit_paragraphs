@@ -36,6 +36,46 @@ function orbit_paragraphs_uninstall($is_syncing) {
 }
 
 /**
+ * Removes invalid Field Group component third-party settings.
+ */
+function orbit_paragraphs_update_12001(): void {
+  orbit_paragraphs_remove_component_field_group_settings();
+}
+
+/**
+ * Removes component-level field_group settings from paragraph form displays.
+ */
+function orbit_paragraphs_remove_component_field_group_settings(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
+
+  foreach ($storage->loadMultiple() as $form_display) {
+    if ($form_display->get('targetEntityType') !== 'paragraph') {
+      continue;
+    }
+
+    $changed = FALSE;
+    foreach ($form_display->getComponents() as $component_name => $component) {
+      if (!isset($component['third_party_settings']['field_group'])) {
+        continue;
+      }
+
+      unset($component['third_party_settings']['field_group']);
+
+      if ($component['third_party_settings'] === []) {
+        unset($component['third_party_settings']);
+      }
+
+      $form_display->setComponent($component_name, $component);
+      $changed = TRUE;
+    }
+
+    if ($changed) {
+      $form_display->save();
+    }
+  }
+}
+
+/**
  * Creates the default Orbit paragraph categories when they do not exist.
  *
  * @return string[]
