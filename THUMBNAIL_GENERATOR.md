@@ -1,5 +1,6 @@
 Python code to generate the thumbnail.
 
+```python
 python3 -c "
 from PIL import Image, ImageDraw
 img = Image.new('RGB', (300, 300), color='white')
@@ -28,3 +29,4 @@ output = '/Users/richard/Development/Sites/orbit_dev/wireframe-mockup.png'
 img.save(output, 'PNG')
 print('Saved to', output)
 "
+```
