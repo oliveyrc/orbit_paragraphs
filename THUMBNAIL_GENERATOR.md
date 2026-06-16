@@ -1,4 +1,4 @@
-Python code to generate the thumbnail.
+Python code to generate the thumbnail. This is a placeholder/example to give style/theme of the thumbnails.
 
 ```python
 python3 -c "
