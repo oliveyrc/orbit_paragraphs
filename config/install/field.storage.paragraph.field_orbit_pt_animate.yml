@@ -8,7 +8,7 @@ field_name: field_orbit_pt_animate
 entity_type: paragraph
 type: boolean
 settings:
-  on_label: Animate
+  on_label: 'Animate'
   off_label: ''
 module: core
 locked: false
