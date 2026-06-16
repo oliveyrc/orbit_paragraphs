@@ -12,5 +12,5 @@ This repository provides shared paragraph tooling in the base `orbit_paragraphs`
 
 | Thumbnail | Title | Description |
 | --- | --- | --- |
-| ![Preview of text section layout](modules/orbit_paragraphs_text/assets/thumbnail.png) | Text | Text section with optional title. |
-| ![Preview of inline image section layout](modules/orbit_paragraphs_image/assets/thumbnail.png) | Inline Image | Inline image with optional title and intro paragraph. |
+| ![Wireframe preview of a text section with title and body copy](modules/orbit_paragraphs_text/assets/thumbnail.png) | Text | Text section with optional title. |
+| ![Wireframe preview of an inline image section with intro text and image](modules/orbit_paragraphs_image/assets/thumbnail.png) | Inline Image | Inline image with optional title and intro paragraph. |
