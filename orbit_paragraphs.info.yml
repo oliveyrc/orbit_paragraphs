@@ -10,3 +10,4 @@ dependencies:
   - paragraphs_ee:paragraphs_ee
   - entity_usage:entity_usage
   - field_group:field_group
+  - orbit_media:orbit_media
