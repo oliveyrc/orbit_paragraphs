@@ -224,7 +224,7 @@ final class OrbitPageSectionsController extends ControllerBase {
       ];
     }
 
-    $build['footer'] = orbit_media_page_footer();
+    $build['footer'] = orbit_page_footer();
 
     return $build;
   }
