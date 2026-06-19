@@ -2,15 +2,15 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.orbit_paragraphs_inline_image.field_orbit_pt_images
-    - field.field.paragraph.orbit_paragraphs_inline_image.field_orbit_pt_section_text
-    - field.field.paragraph.orbit_paragraphs_inline_image.field_orbit_pt_section_title
-    - paragraphs.paragraphs_type.orbit_paragraphs_inline_image
+    - field.field.paragraph.op_image_inline_image.field_orbit_pt_images
+    - field.field.paragraph.op_image_inline_image.field_orbit_pt_section_text
+    - field.field.paragraph.op_image_inline_image.field_orbit_pt_section_title
+    - paragraphs.paragraphs_type.op_image_inline_image
   module:
     - text
-id: paragraph.orbit_paragraphs_inline_image.default
+id: paragraph.op_image_inline_image.default
 targetEntityType: paragraph
-bundle: orbit_paragraphs_inline_image
+bundle: op_image_inline_image
 mode: default
 content:
   field_orbit_pt_images:

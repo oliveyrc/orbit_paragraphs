@@ -8,7 +8,7 @@ third_party_settings:
     paragraphs_categories:
       - media
       - text
-id: orbit_paragraphs_inline_image
+id: op_image_inline_image
 label: 'Inline Image'
 icon_uuid: null
 icon_default: null
