@@ -3,13 +3,13 @@ status: true
 dependencies:
   config:
     - field.storage.paragraph.field_text
-    - paragraphs.paragraphs_type.orbit_paragraphs_text
+    - paragraphs.paragraphs_type.op_text
   module:
     - text
-id: paragraph.orbit_paragraphs_text.field_text
+id: paragraph.op_text.field_text
 field_name: field_text
 entity_type: paragraph
-bundle: orbit_paragraphs_text
+bundle: op_text
 label: Text
 description: ''
 required: true

@@ -7,7 +7,7 @@ third_party_settings:
   paragraphs_ee:
     paragraphs_categories:
       - text
-id: orbit_paragraphs_text
+id: op_text
 label: Text
 icon_uuid: null
 icon_default: null

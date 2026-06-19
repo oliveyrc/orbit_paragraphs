@@ -2,15 +2,15 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.orbit_paragraphs_text.field_orbit_pt_section_text
-    - field.field.paragraph.orbit_paragraphs_text.field_orbit_pt_section_title
-    - field.field.paragraph.orbit_paragraphs_text.field_text
-    - paragraphs.paragraphs_type.orbit_paragraphs_text
+    - field.field.paragraph.op_text.field_orbit_pt_section_text
+    - field.field.paragraph.op_text.field_orbit_pt_section_title
+    - field.field.paragraph.op_text.field_text
+    - paragraphs.paragraphs_type.op_text
   module:
     - text
-id: paragraph.orbit_paragraphs_text.default
+id: paragraph.op_text.default
 targetEntityType: paragraph
-bundle: orbit_paragraphs_text
+bundle: op_text
 mode: default
 content:
   field_orbit_pt_section_text:

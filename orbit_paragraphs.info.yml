@@ -8,6 +8,7 @@ dependencies:
   - drupal:text
   - paragraphs:paragraphs
   - paragraphs_ee:paragraphs_ee
+  - paragraphs_library:paragraphs_library
   - entity_usage:entity_usage
   - field_group:field_group
   - orbit_media:orbit_media
