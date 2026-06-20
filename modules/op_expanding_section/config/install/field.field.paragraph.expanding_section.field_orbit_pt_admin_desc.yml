@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_orbit_pt_admin_desc
+    - paragraphs.paragraphs_type.expanding_section
+id: paragraph.expanding_section.field_orbit_pt_admin_desc
+field_name: field_orbit_pt_admin_desc
+entity_type: paragraph
+bundle: expanding_section
+label: 'Admin description'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

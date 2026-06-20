@@ -1,0 +1,137 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.expanding_section.field_orbit_pt_admin_desc
+    - field.field.paragraph.expanding_section.field_orbit_pt_items
+    - field.field.paragraph.expanding_section.field_orbit_pt_section_text
+    - field.field.paragraph.expanding_section.field_orbit_pt_section_title
+    - paragraphs.paragraphs_type.expanding_section
+  module:
+    - field_group
+    - paragraphs
+    - paragraphs_ee
+    - paragraphs_features
+    - text
+third_party_settings:
+  field_group:
+    group_tabs:
+      children:
+        - group_content
+        - group_settings
+      label: Tabs
+      region: content
+      parent_name: ''
+      weight: 0
+      format_type: tabs
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+        direction: horizontal
+        width_breakpoint: 640
+    group_content:
+      children:
+        - field_orbit_pt_section_title
+        - field_orbit_pt_section_text
+        - field_orbit_pt_items
+      label: Content
+      region: content
+      parent_name: group_tabs
+      weight: 0
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: open
+        description: ''
+        required_fields: true
+    group_settings:
+      children:
+        - status
+        - field_orbit_pt_admin_desc
+      label: Settings
+      region: content
+      parent_name: group_tabs
+      weight: 1
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+_core:
+  default_config_hash: 3b6fkA08P-9EGtgkspeJeJReH8ZRkAG__mz3Tj1sU1M
+id: paragraph.expanding_section.default
+targetEntityType: paragraph
+bundle: expanding_section
+mode: default
+content:
+  field_orbit_pt_admin_desc:
+    type: string_textfield
+    weight: 121
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_orbit_pt_items:
+    type: paragraphs
+    weight: -8
+    region: content
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: closed
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: button
+      form_display_mode: default
+      default_paragraph_type: expanding_section_item
+      features:
+        add_above: add_above
+        collapse_edit_all: collapse_edit_all
+        convert: '0'
+        duplicate: duplicate
+    third_party_settings:
+      paragraphs_features:
+        add_in_between: false
+        add_in_between_link_count: 3
+        delete_confirmation: false
+        show_drag_and_drop: true
+        show_collapse_all: true
+      paragraphs_ee:
+        paragraphs_ee:
+          dialog_off_canvas: false
+          dialog_style: tiles
+          drag_drop: false
+          sidebar_disabled: false
+  field_orbit_pt_section_text:
+    type: text_textarea
+    weight: -9
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_orbit_pt_section_title:
+    type: string_textfield
+    weight: -10
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 120
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+hidden:
+  created: true

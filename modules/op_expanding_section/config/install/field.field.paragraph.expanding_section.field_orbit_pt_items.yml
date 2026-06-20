@@ -1,0 +1,36 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_orbit_pt_items
+    - paragraphs.paragraphs_type.expanding_section
+    - paragraphs.paragraphs_type.expanding_section_item
+  module:
+    - entity_reference_revisions
+id: paragraph.expanding_section.field_orbit_pt_items
+field_name: field_orbit_pt_items
+entity_type: paragraph
+bundle: expanding_section
+label: Section
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      expanding_section_item: expanding_section_item
+    negate: 0
+    target_bundles_drag_drop:
+      expanding_section:
+        weight: 6
+        enabled: false
+      expanding_section_item:
+        weight: 4
+        enabled: true
+      from_library:
+        weight: 5
+        enabled: false
+field_type: entity_reference_revisions

@@ -1,0 +1,38 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.expanding_section.field_orbit_pt_admin_desc
+    - field.field.paragraph.expanding_section.field_orbit_pt_items
+    - field.field.paragraph.expanding_section.field_orbit_pt_section_text
+    - field.field.paragraph.expanding_section.field_orbit_pt_section_title
+    - paragraphs.paragraphs_type.expanding_section
+  module:
+    - entity_reference_revisions
+_core:
+  default_config_hash: GdvRc_pTr2_B2hVW4VREdx46KVwmWEMZMnVjyIRUhVY
+id: paragraph.expanding_section.default
+targetEntityType: paragraph
+bundle: expanding_section
+mode: default
+content:
+  field_orbit_pt_admin_desc:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_orbit_pt_items:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  field_orbit_pt_section_text: true
+  field_orbit_pt_section_title: true
