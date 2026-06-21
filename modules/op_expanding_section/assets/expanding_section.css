@@ -108,12 +108,12 @@
 }
 
 /* Respect users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-.pt--expanding-section {
-  .toggle-panel-outer,
-  .toggle-icon,
-  .toggle-trigger {
-    transition: none !important;
+  @media (prefers-reduced-motion: reduce) {
+  .pt--expanding-section {
+    .toggle-panel-outer,
+    .toggle-icon,
+    .toggle-trigger {
+      transition: none !important;
+    }
   }
-}
 }

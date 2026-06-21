@@ -18,3 +18,5 @@ This repository provides shared paragraph tooling in the base `orbit_paragraphs`
 | TBD | 50/50 Image Text | Two-column section with balanced image and text content. | ⬜ |
 | TBD | File Download | Download section for files with title, description, and file link. | ⬜ |
 | TBD | Video | Video section for embedded or uploaded media with optional supporting copy. | ⬜ |
+| TBD | Full width Image | Simple full width image. | ⬜ |
+| TBD | Full width Image and text | Simple full width image with title, text and link. | ⬜ |
