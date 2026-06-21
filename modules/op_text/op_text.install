@@ -11,6 +11,8 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\paragraphs\Entity\ParagraphsType;
+use Drupal\node\Entity\Node;
+use Drupal\paragraphs\Entity\Paragraph;
 
 /**
  * Implements hook_install().
@@ -20,5 +22,65 @@ function op_text_install(): void {
     'text',
     \Drupal::service('extension.list.module')->getPath('op_text') . '/assets/thumbnail.png',
   );
+  _orbit_op_text_update_dummy_page();
 }
 
+/**
+ * @return void
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _orbit_op_text_update_dummy_page() : void{
+  // Load the dummy node and create and attach one.
+  $config = \Drupal::configFactory()
+    ->getEditable('orbit_paragraphs.settings');
+
+  $paragraph = Paragraph::create([
+    'type' => 'text',
+    'field_orbit_pt_section_title' => t('Additional Text'),
+
+    'field_orbit_pt_section_text' => [
+      'value' => orbit_generate_dummy_text(count: 1),
+      'format' => 'full_html',
+    ],
+
+    'field_text' => [
+      'value' => orbit_generate_dummy_text(),
+      'format' => 'full_html',
+    ],
+  ]);
+  $paragraph->save();
+
+  $node = Node::load($config->get('dummy_page_nid'));
+
+  $current = $node->get('field_additional_body_content')->getValue();
+  $current[] = [
+    'target_id' => $paragraph->id(),
+    'target_revision_id' => $paragraph->getRevisionId(),
+  ];
+  $node->set('field_additional_body_content', $current);
+
+  $paragraph = Paragraph::create([
+    'type' => 'text',
+    'field_orbit_pt_section_title' => t('Additional Text'),
+
+    'field_orbit_pt_section_text' => [
+      'value' => orbit_generate_dummy_text(count: 1),
+      'format' => 'full_html',
+    ],
+
+    'field_text' => [
+      'value' => orbit_generate_dummy_text(),
+      'format' => 'full_html',
+    ],
+  ]);
+  $paragraph->save();
+
+  $current = $node->get('field_post_body_content_page_sec')->getValue();
+  $current[] = [
+    'target_id' => $paragraph->id(),
+    'target_revision_id' => $paragraph->getRevisionId(),
+  ];
+  $node->set('field_post_body_content_page_sec', $current);
+
+  $node->save();
+}

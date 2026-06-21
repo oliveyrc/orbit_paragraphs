@@ -23,8 +23,10 @@
 			<div class="intro">{{ content.field_orbit_pt_section_text.0 }}</div>
 		{% endif %}
 
+		{{ content.field_text.0}}
+
 		{% block content %}
-			{{ content|without('field_orbit_pt_section_title','field_orbit_pt_section_text') }}
+			{{ content|without('field_orbit_pt_section_title','field_orbit_pt_section_text','field_text') }}
 		{% endblock %}
 
 	</section>
