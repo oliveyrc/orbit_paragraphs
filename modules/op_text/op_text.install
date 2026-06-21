@@ -17,7 +17,7 @@ use Drupal\paragraphs\Entity\ParagraphsType;
  */
 function op_text_install(): void {
   orbit_paragraphs_set_paragraph_type_icon(
-    'op_text',
+    'text',
     \Drupal::service('extension.list.module')->getPath('op_text') . '/assets/thumbnail.png',
   );
 }

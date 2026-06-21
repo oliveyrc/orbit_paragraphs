@@ -3,13 +3,13 @@ status: true
 dependencies:
   config:
     - field.storage.paragraph.field_text
-    - paragraphs.paragraphs_type.op_text
+    - paragraphs.paragraphs_type.text
   module:
     - text
-id: paragraph.op_text.field_text
+id: paragraph.text.field_text
 field_name: field_text
 entity_type: paragraph
-bundle: op_text
+bundle: text
 label: Text
 description: ''
 required: true

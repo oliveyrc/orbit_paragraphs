@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 function op_text_theme($existing, $type, $theme, $path): array {
   return [
-    'paragraph__op_text' => [
+    'paragraph__text' => [
       'render element' => 'elements',
       'base hook' => 'paragraph',
     ],

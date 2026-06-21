@@ -3,13 +3,13 @@ status: true
 dependencies:
   config:
     - field.storage.paragraph.field_orbit_pt_section_text
-    - paragraphs.paragraphs_type.op_text
+    - paragraphs.paragraphs_type.text
   module:
     - text
-id: paragraph.op_text.field_orbit_pt_section_text
+id: paragraph.text.field_orbit_pt_section_text
 field_name: field_orbit_pt_section_text
 entity_type: paragraph
-bundle: op_text
+bundle: text
 label: 'Section Text'
 description: ''
 required: false
