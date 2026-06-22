@@ -22,3 +22,4 @@ This repository provides shared paragraph tooling in the base `orbit_paragraphs`
 | TBD | Full width Image and text | Simple full width image with title, text and link. | ⬜ |
 | TBD | Inline CTA | Simple CTA with title, text and link | ⬜ |
 | TBD | Image slider | Image slider with controls | ⬜ |
+| TBD | Quote | Quote section | ⬜ |
