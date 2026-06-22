@@ -2,10 +2,10 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.op_image_inline_image.field_orbit_pt_images
-    - field.field.paragraph.op_image_inline_image.field_orbit_pt_section_text
-    - field.field.paragraph.op_image_inline_image.field_orbit_pt_section_title
-    - paragraphs.paragraphs_type.op_image_inline_image
+    - field.field.paragraph.image.field_images
+    - field.field.paragraph.image.field_orbit_pt_section_text
+    - field.field.paragraph.image.field_orbit_pt_section_title
+    - paragraphs.paragraphs_type.image
   module:
     - field_group
     - media_library
@@ -33,7 +33,7 @@ third_party_settings:
       children:
         - field_orbit_pt_section_title
         - field_orbit_pt_section_text
-        - field_orbit_pt_images
+        - field_images
       label: Content
       region: content
       parent_name: group_tabs
@@ -59,12 +59,12 @@ third_party_settings:
         formatter: closed
         description: ''
         required_fields: true
-id: paragraph.op_image_inline_image.default
+id: paragraph.image.default
 targetEntityType: paragraph
-bundle: op_image_inline_image
+bundle: image
 mode: default
 content:
-  field_orbit_pt_images:
+  field_images:
     type: media_library_widget
     weight: -8
     region: content

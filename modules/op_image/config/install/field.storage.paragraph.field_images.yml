@@ -4,8 +4,8 @@ dependencies:
   module:
     - media
     - paragraphs
-id: paragraph.field_orbit_pt_images
-field_name: field_orbit_pt_images
+id: paragraph.field_images
+field_name: field_images
 entity_type: paragraph
 type: entity_reference
 settings:

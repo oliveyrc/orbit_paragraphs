@@ -3,11 +3,11 @@ status: true
 dependencies:
   config:
     - field.storage.paragraph.field_orbit_pt_section_title
-    - paragraphs.paragraphs_type.op_image_inline_image
-id: paragraph.op_image_inline_image.field_orbit_pt_section_title
+    - paragraphs.paragraphs_type.image
+id: paragraph.image.field_orbit_pt_section_title
 field_name: field_orbit_pt_section_title
 entity_type: paragraph
-bundle: op_image_inline_image
+bundle: image
 label: 'Section Title'
 description: ''
 required: false

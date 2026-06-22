@@ -8,7 +8,7 @@ third_party_settings:
     paragraphs_categories:
       - media
       - text
-id: op_image_inline_image
+id: image
 label: 'Inline Image'
 icon_uuid: null
 icon_default: null

@@ -2,18 +2,18 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.op_image_inline_image.field_orbit_pt_images
-    - field.field.paragraph.op_image_inline_image.field_orbit_pt_section_text
-    - field.field.paragraph.op_image_inline_image.field_orbit_pt_section_title
-    - paragraphs.paragraphs_type.op_image_inline_image
+    - field.field.paragraph.image.field_images
+    - field.field.paragraph.image.field_orbit_pt_section_text
+    - field.field.paragraph.image.field_orbit_pt_section_title
+    - paragraphs.paragraphs_type.image
   module:
     - text
-id: paragraph.op_image_inline_image.default
+id: paragraph.image.default
 targetEntityType: paragraph
-bundle: op_image_inline_image
+bundle: image
 mode: default
 content:
-  field_orbit_pt_images:
+  field_images:
     type: entity_reference_entity_view
     label: hidden
     settings:

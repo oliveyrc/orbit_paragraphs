@@ -2,13 +2,13 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.paragraph.field_orbit_pt_images
+    - field.storage.paragraph.field_images
     - media.type.image
-    - paragraphs.paragraphs_type.op_image_inline_image
-id: paragraph.op_image_inline_image.field_orbit_pt_images
-field_name: field_orbit_pt_images
+    - paragraphs.paragraphs_type.image
+id: paragraph.image.field_images
+field_name: field_images
 entity_type: paragraph
-bundle: op_image_inline_image
+bundle: image
 label: Images
 description: ''
 required: true
