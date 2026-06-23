@@ -17,9 +17,5 @@ function op_text_theme($existing, $type, $theme, $path): array {
       'render element' => 'elements',
       'base hook' => 'paragraph',
     ],
-    'field__node__field_additional_body_content' => [
-      'render element' => 'elements',
-      'base hook' => 'field',
-    ],
   ];
 }
