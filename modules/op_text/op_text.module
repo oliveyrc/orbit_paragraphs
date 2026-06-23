@@ -17,5 +17,9 @@ function op_text_theme($existing, $type, $theme, $path): array {
       'render element' => 'elements',
       'base hook' => 'paragraph',
     ],
+    'paragraph__text__post_body_content_page_sec' => [
+      'render element' => 'elements',
+      'base hook' => 'paragraph',
+    ],
   ];
 }
