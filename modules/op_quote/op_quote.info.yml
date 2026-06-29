@@ -1,0 +1,7 @@
+name: Quote
+type: module
+description: Provide a quote paragraph bundle for use in Orbit builds.
+core_version_requirement:  ^11
+dependencies:
+  - orbit_paragraphs:orbit_paragraphs
+package: Orbit Paragraphs

@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\file\Entity\File;
+use Drupal\file\FileInterface;
+use Drupal\paragraphs\Entity\ParagraphsType;
+
+/**
+ * Implements hook_install().
+ */
+function op_quote_install(): void {
+  orbit_paragraphs_set_paragraph_type_icon(
+    'quote',
+    \Drupal::service('extension.list.module')->getPath('op_quote') . '/assets/thumbnail.png',
+  );
+}
+
+

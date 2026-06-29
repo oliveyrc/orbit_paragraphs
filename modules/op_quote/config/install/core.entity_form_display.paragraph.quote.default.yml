@@ -1,0 +1,108 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.quote.field_attribution
+    - field.field.paragraph.quote.field_orbit_pt_section_text
+    - field.field.paragraph.quote.field_orbit_pt_section_title
+    - field.field.paragraph.quote.field_quote
+    - paragraphs.paragraphs_type.quote
+  module:
+    - field_group
+    - text
+third_party_settings:
+  field_group:
+    group_tabs:
+      children:
+        - group_content
+        - group_settings
+      label: Tabs
+      region: content
+      parent_name: ''
+      weight: 0
+      format_type: tabs
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+        direction: horizontal
+        width_breakpoint: 640
+    group_content:
+      children:
+        - field_orbit_pt_section_title
+        - field_orbit_pt_section_text
+        - field_quote
+        - field_attribution
+      label: Content
+      region: content
+      parent_name: group_tabs
+      weight: 0
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: open
+        description: ''
+        required_fields: true
+    group_settings:
+      children:
+        - status
+      label: Settings
+      region: content
+      parent_name: group_tabs
+      weight: 1
+      format_type: tab
+      format_settings:
+        classes: ''
+        id: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+id: paragraph.quote.default
+targetEntityType: paragraph
+bundle: quote
+mode: default
+content:
+  field_attribution:
+    type: string_textfield
+    weight: -7
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_orbit_pt_section_text:
+    type: text_textarea
+    weight: -9
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_orbit_pt_section_title:
+    type: string_textfield
+    weight: -10
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_quote:
+    type: string_textfield
+    weight: -8
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 120
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+hidden:
+  created: true
