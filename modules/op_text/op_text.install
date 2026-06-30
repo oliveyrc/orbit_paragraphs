@@ -32,7 +32,7 @@ function op_text_install(): void {
 function _orbit_op_text_update_dummy_page() : void{
   // Load the dummy node and create and attach one.
   $config = \Drupal::configFactory()
-    ->getEditable('orbit_paragraphs.settings');
+    ->getEditable('orbit.settings');
 
   $paragraph = Paragraph::create([
     'type' => 'text',
