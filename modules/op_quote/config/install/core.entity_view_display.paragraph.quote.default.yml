@@ -52,11 +52,10 @@ content:
     weight: 0
     region: content
   field_quote:
-    type: string
+    type: text_default
     label: hidden
-    settings:
-      link_to_entity: false
+    settings: {  }
     third_party_settings: {  }
-    weight: 2
+    weight: 5
     region: content
 hidden: {  }
