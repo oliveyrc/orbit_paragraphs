@@ -1,11 +1,14 @@
 <?php
 
+/**
+ * @file
+ * Install hooks for the Orbit Paragraphs Quote module.
+ */
+
 declare(strict_types=1);
 
-use Drupal\Core\File\FileSystemInterface;
-use Drupal\file\Entity\File;
-use Drupal\file\FileInterface;
-use Drupal\paragraphs\Entity\ParagraphsType;
+use Drupal\node\Entity\Node;
+use Drupal\paragraphs\Entity\Paragraph;
 
 /**
  * Implements hook_install().
@@ -15,6 +18,49 @@ function op_quote_install(): void {
     'quote',
     \Drupal::service('extension.list.module')->getPath('op_quote') . '/assets/thumbnail.png',
   );
+
+  _orbit_op_quote_update_dummy_page();
 }
 
+/**
+ * Adds a quote sample to the dummy page additional body content.
+ */
+function _orbit_op_quote_update_dummy_page(): void {
+  $config = \Drupal::configFactory()
+    ->getEditable('orbit.settings');
 
+  $dummy_page_nid = $config->get('dummy_page_nid');
+  if (empty($dummy_page_nid)) {
+    return;
+  }
+
+  $node = Node::load($dummy_page_nid);
+  if (!$node instanceof Node || !$node->hasField('field_additional_body_content')) {
+    return;
+  }
+
+  $quote = Paragraph::create([
+    'type' => 'quote',
+    'field_orbit_pt_section_title' => t('Featured Quote'),
+    'field_orbit_pt_section_text' => [
+      'value' => '<p>A highlighted quote section for this page.</p>',
+      'format' => 'basic_html',
+    ],
+    'field_quote' => [
+      'value' => 'Good design is as little design as possible.',
+      'format' => 'basic_html',
+    ],
+    'field_attribution' => t('Dieter Rams'),
+    'field_cite' => 'https://en.wikiquote.org/wiki/Dieter_Rams',
+  ]);
+  $quote->save();
+
+  $current = $node->get('field_additional_body_content')->getValue();
+  $current[] = [
+    'target_id' => $quote->id(),
+    'target_revision_id' => $quote->getRevisionId(),
+  ];
+
+  $node->set('field_additional_body_content', $current);
+  $node->save();
+}
