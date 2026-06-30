@@ -1,11 +1,14 @@
 <?php
 
+/**
+ * @file
+ * Install hooks for the Orbit Paragraphs Expanding Section module.
+ */
+
 declare(strict_types=1);
 
-use Drupal\Core\File\FileSystemInterface;
-use Drupal\file\Entity\File;
-use Drupal\file\FileInterface;
-use Drupal\paragraphs\Entity\ParagraphsType;
+use Drupal\node\Entity\Node;
+use Drupal\paragraphs\Entity\Paragraph;
 
 /**
  * Implements hook_install().
@@ -15,5 +18,62 @@ function op_expanding_section_install(): void {
     'expanding_section',
     \Drupal::service('extension.list.module')->getPath('op_expanding_section') . '/assets/thumbnail.png',
   );
+
+  _orbit_op_expanding_section_update_dummy_page();
 }
 
+/**
+ * Adds an expanding section sample to the dummy page additional body content.
+ */
+function _orbit_op_expanding_section_update_dummy_page(): void {
+  $config = \Drupal::configFactory()
+    ->getEditable('orbit.settings');
+
+  $dummy_page_nid = $config->get('dummy_page_nid');
+  if (empty($dummy_page_nid)) {
+    return;
+  }
+
+  $node = Node::load($dummy_page_nid);
+  if (!$node instanceof Node || !$node->hasField('field_additional_body_content')) {
+    return;
+  }
+
+  $toggle_items = [];
+  for ($item = 1; $item <= 3; $item++) {
+    $toggle_item = Paragraph::create([
+      'type' => 'expanding_section_item',
+      'field_orbit_pt_section_title' => t('Toggle Section @number', ['@number' => $item]),
+      'field_orbit_pt_section_text' => [
+        'value' => '<p>This is sample content for toggle section ' . $item . '.</p>',
+        'format' => 'basic_html',
+      ],
+    ]);
+    $toggle_item->save();
+
+    $toggle_items[] = [
+      'target_id' => $toggle_item->id(),
+      'target_revision_id' => $toggle_item->getRevisionId(),
+    ];
+  }
+
+  $expanding_section = Paragraph::create([
+    'type' => 'expanding_section',
+    'field_orbit_pt_section_title' => t('Expanding Section'),
+    'field_orbit_pt_section_text' => [
+      'value' => '<p>Explore the toggle sections below for more details.</p>',
+      'format' => 'basic_html',
+    ],
+    'field_orbit_pt_items' => $toggle_items,
+  ]);
+  $expanding_section->save();
+
+  $current = $node->get('field_additional_body_content')->getValue();
+  $current[] = [
+    'target_id' => $expanding_section->id(),
+    'target_revision_id' => $expanding_section->getRevisionId(),
+  ];
+
+  $node->set('field_additional_body_content', $current);
+  $node->save();
+}
