@@ -3,12 +3,14 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.quote.field_attribution
+    - field.field.paragraph.quote.field_cite
     - field.field.paragraph.quote.field_orbit_pt_section_text
     - field.field.paragraph.quote.field_orbit_pt_section_title
     - field.field.paragraph.quote.field_quote
     - paragraphs.paragraphs_type.quote
   module:
     - field_group
+    - link
     - text
 third_party_settings:
   field_group:
@@ -35,6 +37,7 @@ third_party_settings:
         - field_orbit_pt_section_text
         - field_quote
         - field_attribution
+        - field_cite
       label: Content
       region: content
       parent_name: group_tabs
@@ -72,6 +75,14 @@ content:
     settings:
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  field_cite:
+    type: link_default
+    weight: -6
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
     third_party_settings: {  }
   field_orbit_pt_section_text:
     type: text_textarea

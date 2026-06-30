@@ -3,11 +3,13 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.quote.field_attribution
+    - field.field.paragraph.quote.field_cite
     - field.field.paragraph.quote.field_orbit_pt_section_text
     - field.field.paragraph.quote.field_orbit_pt_section_title
     - field.field.paragraph.quote.field_quote
     - paragraphs.paragraphs_type.quote
   module:
+    - link
     - text
 id: paragraph.quote.default
 targetEntityType: paragraph
@@ -16,22 +18,34 @@ mode: default
 content:
   field_attribution:
     type: string
-    label: above
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
     weight: 3
     region: content
+  field_cite:
+    type: link_separate
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 4
+    region: content
   field_orbit_pt_section_text:
     type: text_default
-    label: above
+    label: hidden
     settings: {  }
     third_party_settings: {  }
     weight: 1
     region: content
   field_orbit_pt_section_title:
     type: string
-    label: above
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
@@ -39,7 +53,7 @@ content:
     region: content
   field_quote:
     type: string
-    label: above
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }

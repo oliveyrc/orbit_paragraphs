@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_cite
+    - paragraphs.paragraphs_type.quote
+  module:
+    - link
+id: paragraph.quote.field_cite
+field_name: field_cite
+entity_type: paragraph
+bundle: quote
+label: Cite
+description: 'Optional URL this is added to the blockquote element in the markup. Used for screen readers and search engines.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 0
+  link_type: 16
+field_type: link

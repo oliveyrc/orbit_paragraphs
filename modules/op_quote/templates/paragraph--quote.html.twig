@@ -4,30 +4,40 @@
 {% set classes = [
   'p',
   'pt--' ~ paragraph.bundle|clean_class,
-  not paragraph.isPublished() ? 'paragraph--unpublished'
+  not paragraph.isPublished() ? 'paragraph--unpublished',
 ] %}
 
 {% set section_attributes = attributes.addClass(classes) %}
 
 {% if logged_in and paragraph.id() %}
-	{% set section_attributes = section_attributes.setAttribute('id', 'paragraph-' ~ paragraph.id()) %}
+  {% set section_attributes = section_attributes.setAttribute('id', 'paragraph-' ~ paragraph.id()) %}
 {% endif %}
 
 {% block paragraph %}
-	<section{{ section_attributes }}>
+  <section{{ section_attributes }}>
     {% if not paragraph.field_orbit_pt_section_title.isEmpty() %}
-			<header>
-          <h2>{{ content.field_orbit_pt_section_title.0 }}</h2>
-			</header>
-		{% endif %}
+      <header>
+        <h2>{{ content.field_orbit_pt_section_title.0 }}</h2>
+      </header>
+    {% endif %}
 
-		{% if not paragraph.field_orbit_pt_section_text.isEmpty() %}
-			<div class="intro">{{ content.field_orbit_pt_section_text.0 }}</div>
-		{% endif %}
+    {% if not paragraph.field_orbit_pt_section_text.isEmpty() %}
+      <div class="intro">{{ content.field_orbit_pt_section_text.0 }}</div>
+    {% endif %}
 
-		{% block content %}
-			{{ content|without('field_orbit_pt_section_title','field_orbit_pt_section_text') }}
-		{% endblock %}
+    <figure>
+      <blockquote{% if not paragraph.field_cite.isEmpty() %} cite="{{ content.field_cite.0['#url'] }}"{% endif %}>
+        {{ content.field_quote.0 }}
+      </blockquote>
+      {% if not paragraph.field_attribution.isEmpty() %}
+        <figcaption>
+          {{ content.field_attribution.0 }}
+        </figcaption>
+      {% endif %}
+    </figure>
 
-	</section>
+    {% block content %}
+      {{ content|without('field_cite', 'field_attribution', 'field_quote', 'field_orbit_pt_section_title', 'field_orbit_pt_section_text') }}
+    {% endblock %}
+  </section>
 {% endblock paragraph %}
