@@ -100,3 +100,30 @@ function orbit_paragraphs_create_default_categories(): array {
 
   return $created;
 }
+
+/**
+ * Returns the default Orbit paragraph categories.
+ *
+ * @return array<int, array{id: string, label: string}>
+ *   The default categories keyed in display order.
+ */
+function orbit_paragraphs_default_categories(): array {
+  return [
+    [
+      'id' => 'news',
+      'label' => 'News',
+    ],
+    [
+      'id' => 'cta',
+      'label' => 'CTA',
+    ],
+    [
+      'id' => 'media',
+      'label' => 'Media',
+    ],
+    [
+      'id' => 'text',
+      'label' => 'Text',
+    ],
+  ];
+}
