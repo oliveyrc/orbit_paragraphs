@@ -59,28 +59,28 @@ function _orbit_op_text_update_dummy_page() : void{
   ];
   $node->set('field_additional_body_content', $current);
 
-  $paragraph = Paragraph::create([
-    'type' => 'text',
-    'field_orbit_pt_section_title' => t('Additional Text'),
+  // $paragraph = Paragraph::create([
+  //   'type' => 'text',
+  //   'field_orbit_pt_section_title' => t('Additional Text'),
 
-    'field_orbit_pt_section_text' => [
-      'value' => orbit_generate_dummy_text(count: 1),
-      'format' => 'full_html',
-    ],
+  //   'field_orbit_pt_section_text' => [
+  //     'value' => orbit_generate_dummy_text(count: 1),
+  //     'format' => 'full_html',
+  //   ],
 
-    'field_text' => [
-      'value' => orbit_generate_dummy_text(),
-      'format' => 'full_html',
-    ],
-  ]);
-  $paragraph->save();
+  //   'field_text' => [
+  //     'value' => orbit_generate_dummy_text(),
+  //     'format' => 'full_html',
+  //   ],
+  // ]);
+  // $paragraph->save();
 
-  $current = $node->get('field_post_body_content_page_sec')->getValue();
-  $current[] = [
-    'target_id' => $paragraph->id(),
-    'target_revision_id' => $paragraph->getRevisionId(),
-  ];
-  $node->set('field_post_body_content_page_sec', $current);
+  // $current = $node->get('field_post_body_content_page_sec')->getValue();
+  // $current[] = [
+  //   'target_id' => $paragraph->id(),
+  //   'target_revision_id' => $paragraph->getRevisionId(),
+  // ];
+  // $node->set('field_post_body_content_page_sec', $current);
 
   $node->save();
 }

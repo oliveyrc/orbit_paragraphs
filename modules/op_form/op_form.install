@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for Orbit Paragraphs Image.
+ */
+
+declare(strict_types=1);
+
+use Drupal\node\Entity\Node;
+use Drupal\paragraphs\Entity\Paragraph;
+
+/**
+ * Implements hook_install().
+ */
+function op_form_install(): void {
+  orbit_paragraphs_set_paragraph_type_icon(
+    'form',
+    \Drupal::service('extension.list.module')->getPath('op_form') . '/assets/thumbnail.png',
+  );
+  _orbit_op_form_update_dummy_page();
+}
+
+/**
+ * @return void
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _orbit_op_form_update_dummy_page() : void{
+  // Load the dummy node and create and attach one.
+  $config = \Drupal::configFactory()
+    ->getEditable('orbit.settings');
+
+  $paragraph = Paragraph::create([
+    'type' => 'form',
+    'field_orbit_pt_section_title' => t('Form'),
+
+    'field_orbit_pt_section_text' => [
+      'value' => orbit_generate_dummy_text(count: 1),
+      'format' => 'full_html',
+    ],
+
+    'field_text' => [
+      'value' => orbit_generate_dummy_text(),
+      'format' => 'full_html',
+    ],
+  ]);
+  $paragraph->save();
+
+  $node = Node::load($config->get('dummy_page_nid'));
+
+  $current = $node->get('field_additional_body_content')->getValue();
+  $current[] = [
+    'target_id' => $paragraph->id(),
+    'target_revision_id' => $paragraph->getRevisionId(),
+  ];
+  $node->set('field_additional_body_content', $current);
+
+  $node->save();
+}

@@ -1,0 +1,44 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.form.field_orbit_pt_section_text
+    - field.field.paragraph.form.field_orbit_pt_section_title
+    - field.field.paragraph.form.field_orbit_webform_form
+    - paragraphs.paragraphs_type.form
+  module:
+    - text
+    - webform
+_core:
+  default_config_hash: frYLP5HQovz3pNKte4Z_yv48S3a8mo-kb9VCx3E4s04
+id: paragraph.form.default
+targetEntityType: paragraph
+bundle: form
+mode: default
+content:
+  field_orbit_pt_section_text:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_orbit_pt_section_title:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+      link_rel: canonical
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_orbit_webform_form:
+    type: webform_entity_reference_entity_view
+    label: hidden
+    settings:
+      source_entity: true
+      lazy: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+hidden: {  }

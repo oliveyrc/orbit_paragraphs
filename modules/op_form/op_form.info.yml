@@ -1,0 +1,8 @@
+name: Form
+type: module
+description: Providees a form paragraph type for Orbit Paragraphs.
+core_version_requirement:  ^11
+dependencies:
+  - orbit_paragraphs:orbit_paragraphs
+  - webform:webform
+package: Orbit Paragraphs
