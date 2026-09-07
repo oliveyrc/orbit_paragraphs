@@ -74,6 +74,11 @@ final class OrbitParagraphsCommands extends DrushCommands
         description: 'Include the Section Text field on this paragraph type. '
             . 'Prompts if omitted.',
     )]
+    #[CLI\Option(
+        name: 'allow-library-conversion',
+        description: 'Allow paragraphs of this type to be promoted to the '
+            . 'Paragraphs library. Prompts if omitted, defaulting to yes.',
+    )]
     #[CLI\Usage(
         name: 'drush orbit-paragraphs:create',
         description: 'Prompt for a paragraph type label, description, and category.',
@@ -100,6 +105,12 @@ final class OrbitParagraphsCommands extends DrushCommands
         name: 'drush orbit-paragraphs:create "Feature" --include-section-text=0',
         description: 'Create the type without the Section Text field.',
     )]
+    #[CLI\Usage(
+        name: 'drush orbit-paragraphs:create "Feature" '
+            . '--allow-library-conversion=0',
+        description: 'Create the type without allowing promotion to the '
+            . 'Paragraphs library.',
+    )]
     public function createParagraphType(
         ?string $label = NULL,
         array $options = [
@@ -108,6 +119,7 @@ final class OrbitParagraphsCommands extends DrushCommands
             'category' => InputOption::VALUE_OPTIONAL,
             'include-section-title' => InputOption::VALUE_OPTIONAL,
             'include-section-text' => InputOption::VALUE_OPTIONAL,
+            'allow-library-conversion' => InputOption::VALUE_OPTIONAL,
         ],
     ): void {
         $label = $label ?: $this->io()->ask(
@@ -136,6 +148,12 @@ final class OrbitParagraphsCommands extends DrushCommands
             'Include Section Text field?',
             TRUE,
             '--include-section-text',
+        );
+        $allow_library_conversion = $this->resolveBooleanOption(
+            $options['allow-library-conversion'] ?? NULL,
+            'Allow promoting to library?',
+            TRUE,
+            '--allow-library-conversion',
         );
         $categories = $this->loadParagraphCategories();
         $category_ids = $this->resolveParagraphCategories(
@@ -171,6 +189,14 @@ final class OrbitParagraphsCommands extends DrushCommands
                 'paragraphs_ee',
                 'paragraphs_categories',
                 $category_ids,
+            );
+        }
+
+        if ($allow_library_conversion) {
+            $paragraph_type->setThirdPartySetting(
+                'paragraphs_library',
+                'allow_library_conversion',
+                TRUE,
             );
         }
 
@@ -217,6 +243,10 @@ final class OrbitParagraphsCommands extends DrushCommands
                 . $machine_name . ') in categories: '
                 . implode(', ', $category_labels)
                 . '.';
+        }
+
+        if ($allow_library_conversion) {
+            $message .= ' Promoting to library is enabled.';
         }
 
         $this->logger()->success($message);
